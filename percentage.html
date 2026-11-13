@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HerbMed Tools - Percentage Calculator</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    direction: rtl;
+    text-align: center;
+    background: #f0f5f2;
+    padding: 15px;
+}
+
+.container {
+    max-width: 450px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px #ccc;
+}
+
+h1 { color: #18734b; }
+
+h3 {
+    color: #333;
+    margin-top: 25px;
+}
+
+input {
+    width: 90%;
+    padding: 12px;
+    margin: 7px;
+    border: 1px solid #aaa;
+    border-radius: 7px;
+    font-size: 17px;
+    box-sizing: border-box;
+}
+
+button {
+    background: #18734b;
+    color: white;
+    padding: 11px 20px;
+    border: none;
+    border-radius: 7px;
+    font-size: 16px;
+    margin: 7px;
+}
+
+.clear {
+    background: #777;
+}
+
+.result {
+    color: #18734b;
+    font-size: 19px;
+    font-weight: bold;
+    margin: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>HerbMed Tools</h1>
+<h2>فیصد کیلکولیٹر</h2>
+
+<h3>1۔ کسی عدد کا فیصد معلوم کریں</h3>
+<input type="number" id="num1" placeholder="عدد لکھیں">
+<input type="number" id="percent1" placeholder="فیصد لکھیں">
+<br>
+<button onclick="calculate1()">حساب کریں</button>
+<button class="clear" onclick="clear1()">صاف کریں</button>
+<p class="result" id="result1"></p>
+
+<h3>2۔ ایک عدد دوسرے کا کتنے فیصد ہے؟</h3>
+<input type="number" id="num2" placeholder="پہلا عدد">
+<input type="number" id="num3" placeholder="دوسرا عدد">
+<br>
+<button onclick="calculate2()">حساب کریں</button>
+<button class="clear" onclick="clear2()">صاف کریں</button>
+<p class="result" id="result2"></p>
+
+<h3>3۔ فیصد اضافہ معلوم کریں</h3>
+<input type="number" id="num4" placeholder="اصل عدد">
+<input type="number" id="percent2" placeholder="اضافے کا فیصد">
+<br>
+<button onclick="calculate3()">حساب کریں</button>
+<button class="clear" onclick="clear3()">صاف کریں</button>
+<p class="result" id="result3"></p>
+
+<h3>4۔ فیصد کمی معلوم کریں</h3>
+<input type="number" id="num5" placeholder="اصل عدد">
+<input type="number" id="percent3" placeholder="کمی کا فیصد">
+<br>
+<button onclick="calculate4()">حساب کریں</button>
+<button class="clear" onclick="clear4()">صاف کریں</button>
+<p class="result" id="result4"></p>
+
+</div>
+
+<script>
+
+function calculate1() {
+    let a = document.getElementById("num1").value;
+    let p = document.getElementById("percent1").value;
+
+    if (a === "" || p === "") {
+        document.getElementById("result1").innerHTML = "دونوں خانے پُر کریں";
+        return;
+    }
+
+    document.getElementById("result1").innerHTML =
+    "نتیجہ: " + (Number(a) * Number(p) / 100);
+}
+
+function calculate2() {
+    let a = document.getElementById("num2").value;
+    let b = document.getElementById("num3").value;
+
+    if (a === "" || b === "") {
+        document.getElementById("result2").innerHTML = "دونوں خانے پُر کریں";
+        return;
+    }
+
+    if (Number(b) === 0) {
+        document.getElementById("result2").innerHTML = "دوسرا عدد صفر نہیں ہو سکتا";
+        return;
+    }
+
+    document.getElementById("result2").innerHTML =
+    "نتیجہ: " + (Number(a) / Number(b) * 100) + "%";
+}
+
+function calculate3() {
+    let a = document.getElementById("num4").value;
+    let p = document.getElementById("percent2").value;
+
+    if (a === "" || p === "") {
+        document.getElementById("result3").innerHTML = "دونوں خانے پُر کریں";
+        return;
+    }
+
+    document.getElementById("result3").innerHTML =
+    "نیا عدد: " + (Number(a) + Number(a) * Number(p) / 100);
+}
+
+function calculate4() {
+    let a = document.getElementById("num5").value;
+    let p = document.getElementById("percent3").value;
+
+    if (a === "" || p === "") {
+        document.getElementById("result4").innerHTML = "دونوں خانے پُر کریں";
+        return;
+    }
+
+    document.getElementById("result4").innerHTML =
+    "باقی عدد: " + (Number(a) - Number(a) * Number(p) / 100);
+}
+
+function clear1() {
+    document.getElementById("num1").value = "";
+    document.getElementById("percent1").value = "";
+    document.getElementById("result1").innerHTML = "";
+}
+
+function clear2() {
+    document.getElementById("num2").value = "";
+    document.getElementById("num3").value = "";
+    document.getElementById("result2").innerHTML = "";
+}
+
+function clear3() {
+    document.getElementById("num4").value = "";
+    document.getElementById("percent2").value = "";
+    document.getElementById("result3").innerHTML = "";
+}
+
+function clear4() {
+    document.getElementById("num5").value = "";
+    document.getElementById("percent3").value = "";
+    document.getElementById("result4").innerHTML = "";
+}
+
+</script>
+
+</body>
+</html>
