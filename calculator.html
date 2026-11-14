@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HerbMed Calculator</title>
+
+<style>
+body {
+    background-color: #eaf2f8;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+}
+
+.calculator {
+    background-color: white;
+    padding: 25px;
+    border-radius: 18px;
+    max-width: 400px;
+    margin: 30px auto;
+    box-shadow: 0 4px 15px #999;
+}
+
+h1 {
+    color: #1976d2;
+    font-size: 30px;
+}
+
+input {
+    width: 90%;
+    padding: 13px;
+    margin: 10px 0;
+    font-size: 18px;
+    border-radius: 8px;
+    border: 1px solid #999;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 12px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 8px;
+    background-color: #1976d2;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0d47a1;
+}
+
+.clear-btn {
+    background-color: #e53935;
+}
+
+.home-btn {
+    display: inline-block;
+    background-color: #18764f;
+    color: white;
+    text-decoration: none;
+    padding: 13px 20px;
+    margin-top: 15px;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.home-btn:hover {
+    background-color: #105c3c;
+}
+
+#result {
+    color: green;
+    margin-top: 25px;
+    font-size: 24px;
+}
+
+.footer {
+    color: gray;
+    font-size: 13px;
+    margin-top: 25px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="calculator">
+
+<h1>HerbMed Calculator</h1>
+
+<p>Simple Online Calculator</p>
+
+<input type="number"
+id="num1"
+step="any"
+placeholder="First number">
+
+<br>
+
+<input type="number"
+id="num2"
+step="any"
+placeholder="Second number">
+
+<br><br>
+
+<button onclick="calculate('+')">
+Add (+)
+</button>
+
+<button onclick="calculate('-')">
+Subtract (-)
+</button>
+
+<button onclick="calculate('*')">
+Multiply (*)
+</button>
+
+<button onclick="calculate('/')">
+Divide (/)
+</button>
+
+<h2 id="result">Result:</h2>
+
+<button class="clear-btn"
+onclick="clearCalculator()">
+Clear
+</button>
+
+<br>
+
+<a class="home-btn" href="home.html">
+مرکزی صفحے پر واپس جائیں
+</a>
+
+<div class="footer">
+HerbMed Tools | 2026
+</div>
+
+</div>
+
+<script>
+
+function calculate(operator) {
+
+let num1 = document.getElementById("num1").value;
+let num2 = document.getElementById("num2").value;
+let result = document.getElementById("result");
+
+if (num1 === "" || num2 === "") {
+result.innerHTML = "Please enter both numbers";
+return;
+}
+
+let a = Number(num1);
+let b = Number(num2);
+let total;
+
+if (operator === "+") {
+total = a + b;
+}
+else if (operator === "-") {
+total = a - b;
+}
+else if (operator === "*") {
+total = a * b;
+}
+else if (operator === "/") {
+
+if (b === 0) {
+result.innerHTML = "Cannot divide by zero";
+return;
+}
+
+total = a / b;
+}
+
+result.innerHTML = "Result: " + total;
+}
+
+function clearCalculator() {
+
+document.getElementById("num1").value = "";
+document.getElementById("num2").value = "";
+document.getElementById("result").innerHTML = "Result:";
+
+}
+
+</script>
+
+</body>
+</html>
