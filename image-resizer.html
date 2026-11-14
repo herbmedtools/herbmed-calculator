@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HerbMed Image Resizer</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+padding:20px;
+background:#edf5f0;
+font-family:Arial,sans-serif;
+color:#24352d;
+}
+
+.container{
+max-width:520px;
+margin:25px auto;
+background:white;
+padding:25px;
+border-radius:18px;
+box-shadow:0 5px 20px #0001;
+text-align:center;
+}
+
+h1{color:#19764e}
+
+p{color:#666}
+
+.upload{
+display:block;
+padding:30px 12px;
+border:2px dashed #198052;
+border-radius:12px;
+margin:20px 0;
+cursor:pointer;
+}
+
+input,select,button{
+width:100%;
+padding:13px;
+margin:9px 0;
+border-radius:9px;
+font-size:16px;
+}
+
+input[type=file]{display:none}
+
+input[type=checkbox]{
+width:auto;
+margin-right:8px;
+}
+
+button{
+border:0;
+background:#19764e;
+color:white;
+cursor:pointer;
+}
+
+button:disabled{opacity:.5}
+
+img{
+max-width:100%;
+max-height:280px;
+object-fit:contain;
+border-radius:10px;
+}
+
+.result{
+background:#eef7f1;
+padding:15px;
+border-radius:10px;
+margin-top:15px;
+}
+
+a{
+display:block;
+text-decoration:none;
+background:#176bb5;
+color:white;
+padding:13px;
+border-radius:9px;
+margin-top:12px;
+}
+
+.home-btn{background:#18764f}
+
+footer{
+color:#888;
+margin-top:25px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>HerbMed Image Resizer</h1>
+<p>Resize Images Easily and Free</p>
+
+<label class="upload" for="file">
+Choose Image / تصویر منتخب کریں
+<input id="file" type="file" accept="image/*">
+</label>
+
+<div id="preview"></div>
+
+<label>Preset Sizes</label>
+
+<select id="preset">
+<option value="custom">Custom Size</option>
+<option value="1000,1500">Pinterest (1000 × 1500)</option>
+<option value="1080,1080">Instagram (1080 × 1080)</option>
+<option value="1200,630">Facebook (1200 × 630)</option>
+<option value="1080,1920">Story (1080 × 1920)</option>
+</select>
+
+<label>Width (Pixels)</label>
+<input type="number" id="width" min="1" max="8000" placeholder="Enter Width">
+
+<label>Height (Pixels)</label>
+<input type="number" id="height" min="1" max="8000" placeholder="Enter Height">
+
+<label>
+<input type="checkbox" id="ratio" checked>
+Maintain Aspect Ratio
+</label>
+
+<button id="resize" disabled>Resize Image</button>
+
+<div id="result" class="result" hidden></div>
+
+<a id="download" hidden>Download Resized Image</a>
+
+<a class="home-btn" href="home.html">
+مرکزی صفحے پر واپس جائیں
+</a>
+
+<footer>HerbMed Tools | 2026</footer>
+
+</div>
+
+<script>
+const fileInput=document.getElementById('file');
+const widthInput=document.getElementById('width');
+const heightInput=document.getElementById('height');
+const ratio=document.getElementById('ratio');
+const preset=document.getElementById('preset');
+const resizeBtn=document.getElementById('resize');
+
+let selectedFile=null;
+let originalWidth=0;
+let originalHeight=0;
+let outputUrl=null;
+
+fileInput.onchange=()=>{
+selectedFile=fileInput.files[0];
+
+if(!selectedFile)return;
+
+if(!selectedFile.type.startsWith('image/')){
+alert('Please select an image.');
+selectedFile=null;
+return;
+}
+
+if(selectedFile.size>20*1024*1024){
+alert('Image must be smaller than 20 MB.');
+selectedFile=null;
+return;
+}
+
+const url=URL.createObjectURL(selectedFile);
+const img=new Image();
+
+img.onload=()=>{
+originalWidth=img.naturalWidth;
+originalHeight=img.naturalHeight;
+
+widthInput.value=originalWidth;
+heightInput.value=originalHeight;
+
+document.getElementById('preview').innerHTML=
+'<img src="'+url+'" alt="Original Image">'+
+'<p>Original Size: '+originalWidth+' × '+originalHeight+'</p>';
+
+resizeBtn.disabled=false;
+
+if(outputUrl){
+URL.revokeObjectURL(outputUrl);
+outputUrl=null;
+}
+
+document.getElementById('result').hidden=true;
+document.getElementById('download').hidden=true;
+};
+
+img.onerror=()=>{
+URL.revokeObjectURL(url);
+alert('Could not read this image.');
+};
+
+img.src=url;
+};
+
+preset.onchange=()=>{
+if(preset.value==='custom')return;
+
+const dimensions=preset.value.split(',');
+widthInput.value=dimensions[0];
+heightInput.value=dimensions[1];
+};
+
+widthInput.oninput=()=>{
+if(ratio.checked && originalWidth){
+const w=Number(widthInput.value);
+heightInput.value=w>0?
+Math.round(w*originalHeight/originalWidth):'';
+}
+};
+
+heightInput.oninput=()=>{
+if(ratio.checked && originalHeight){
+const h=Number(heightInput.value);
+widthInput.value=h>0?
+Math.round(h*originalWidth/originalHeight):'';
+}
+};
+
+resizeBtn.onclick=()=>{
+if(!selectedFile)return;
+
+const w=Number(widthInput.value);
+const h=Number(heightInput.value);
+
+if(!Number.isInteger(w)||!Number.isInteger(h)||
+w<1||h<1||w>8000||h>8000){
+alert('Enter valid dimensions between 1 and 8000.');
+return;
+}
+
+resizeBtn.disabled=true;
+resizeBtn.textContent='Resizing...';
+
+const img=new Image();
+const sourceUrl=URL.createObjectURL(selectedFile);
+
+img.onload=()=>{
+const canvas=document.createElement('canvas');
+canvas.width=w;
+canvas.height=h;
+
+const ctx=canvas.getContext('2d');
+
+ctx.drawImage(img,0,0,w,h);
+
+canvas.toBlob(blob=>{
+URL.revokeObjectURL(sourceUrl);
+
+resizeBtn.disabled=false;
+resizeBtn.textContent='Resize Image';
+
+if(!blob){
+alert('Resizing failed.');
+return;
+}
+
+if(outputUrl)URL.revokeObjectURL(outputUrl);
+
+outputUrl=URL.createObjectURL(blob);
+
+document.getElementById('result').hidden=false;
+
+document.getElementById('result').innerHTML=
+'<b>Resizing Complete!</b><br><br>'+
+'Original: '+originalWidth+' × '+originalHeight+'<br>'+
+'New Size: '+w+' × '+h+'<br>'+
+'File Size: '+(blob.size/1024).toFixed(1)+' KB';
+
+const link=document.getElementById('download');
+
+link.href=outputUrl;
+link.download='herbmed-resized.png';
+link.textContent='Download Resized Image';
+link.hidden=false;
+
+},'image/png');
+};
+
+img.onerror=()=>{
+URL.revokeObjectURL(sourceUrl);
+resizeBtn.disabled=false;
+resizeBtn.textContent='Resize Image';
+alert('Could not read this image.');
+};
+
+img.src=sourceUrl;
+};
+
+</script>
+
+</body>
+</html>
