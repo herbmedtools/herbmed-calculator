@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HerbMed Image Compressor</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:20px;background:#edf5f0;font-family:Arial,sans-serif;color:#24352d}
+.container{max-width:520px;margin:25px auto;background:white;padding:25px;border-radius:18px;box-shadow:0 5px 20px #0001;text-align:center}
+h1{color:#19764e}
+p{color:#666}
+.upload{display:block;padding:30px 12px;border:2px dashed #198052;border-radius:12px;margin:20px 0;cursor:pointer}
+input,select,button{width:100%;padding:13px;margin:9px 0;border-radius:9px;font-size:16px}
+input[type=file]{display:none}
+input[type=range]{padding:0}
+select{border:1px solid #ccc;background:white}
+button{border:0;background:#19764e;color:white;cursor:pointer}
+button:disabled{opacity:.5}
+img{max-width:100%;max-height:260px;object-fit:contain;border-radius:10px}
+.result{background:#eef7f1;padding:15px;border-radius:10px;margin-top:15px}
+a{display:block;text-decoration:none;background:#176bb5;color:white;padding:13px;border-radius:9px;margin-top:12px}
+footer{color:#888;margin-top:25px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>HerbMed Image Compressor</h1>
+<p>Compress images easily and free</p>
+
+<label class="upload" for="file">
+Choose Image / تصویر منتخب کریں
+<input id="file" type="file" accept="image/*">
+</label>
+
+<div id="preview"></div>
+
+<label>Image Quality: <b id="qualityValue">70%</b></label>
+<input id="quality" type="range" min="10" max="100" value="70">
+
+<label>Output Format</label>
+<select id="format">
+<option value="image/webp">WebP</option>
+<option value="image/jpeg">JPG</option>
+<option value="image/png">PNG</option>
+</select>
+
+<button id="compress" disabled>Compress Image</button>
+
+<div id="result" class="result" hidden></div>
+<a id="download" hidden>Download Compressed Image</a>
+<footer>HerbMed Tools | 2026</footer>
+</div>
+
+<script>
+const fileInput=document.getElementById('file');
+const quality=document.getElementById('quality');
+const format=document.getElementById('format');
+const compress=document.getElementById('compress');
+let selectedFile=null;
+let outputUrl=null;
+
+quality.oninput=()=>document.getElementById('qualityValue').textContent=quality.value+'%';
+
+fileInput.onchange=()=>{
+ selectedFile=fileInput.files[0];
+ if(!selectedFile)return;
+ if(!selectedFile.type.startsWith('image/')){
+ alert('Please select an image file.');
+ selectedFile=null;return;
+ }
+ if(selectedFile.size>20*1024*1024){
+ alert('Please choose an image smaller than 20 MB.');
+ selectedFile=null;return;
+ }
+ if(outputUrl){URL.revokeObjectURL(outputUrl);outputUrl=null;}
+ document.getElementById('result').hidden=true;
+ document.getElementById('download').hidden=true;
+ const previewUrl=URL.createObjectURL(selectedFile);
+ document.getElementById('preview').innerHTML=
+ '<img src="'+previewUrl+'" alt="Selected image"><p>Original size: '+(selectedFile.size/1024).toFixed(1)+' KB</p>';
+ compress.disabled=false;
+};
+
+compress.onclick=()=>{
+ if(!selectedFile)return;
+ compress.disabled=true;
+ compress.textContent='Compressing...';
+ const img=new Image();
+ const sourceUrl=URL.createObjectURL(selectedFile);
+ img.onload=()=>{
+  const canvas=document.createElement('canvas');
+  canvas.width=img.naturalWidth;
+  canvas.height=img.naturalHeight;
+  const ctx=canvas.getContext('2d');
+  if(format.value==='image/jpeg'){
+   ctx.fillStyle='#ffffff';
+   ctx.fillRect(0,0,canvas.width,canvas.height);
+  }
+  ctx.drawImage(img,0,0);
+  canvas.toBlob(blob=>{
+   URL.revokeObjectURL(sourceUrl);
+   compress.disabled=false;
+   compress.textContent='Compress Image';
+   if(!blob){alert('Compression failed. Try another format.');return;}
+   if(outputUrl)URL.revokeObjectURL(outputUrl);
+   outputUrl=URL.createObjectURL(blob);
+   const saved=(1-blob.size/selectedFile.size)*100;
+   document.getElementById('result').hidden=false;
+   document.getElementById('result').innerHTML=
+   '<b>Compression Complete!</b><br><br>Original: '+(selectedFile.size/1024).toFixed(1)+' KB<br>New Size: '+(blob.size/1024).toFixed(1)+' KB<br>Size Change: '+(saved>=0?saved.toFixed(1)+'% smaller':Math.abs(saved).toFixed(1)+'% larger');
+   const link=document.getElementById('download');
+   link.href=outputUrl;
+   link.download='herbmed-compressed.'+({'image/webp':'webp','image/jpeg':'jpg','image/png':'png'}[format.value]);
+   link.textContent='Download Compressed Image';
+   link.hidden=false;
+  },format.value,Number(quality.value)/100);
+ };
+ img.onerror=()=>{
+  URL.revokeObjectURL(sourceUrl);
+  compress.disabled=false;
+  compress.textContent='Compress Image';
+  alert('Could not read this image.');
+ };
+ img.src=sourceUrl;
+};
+</script>
+</body>
+</html>
