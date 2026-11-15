@@ -1,0 +1,488 @@
+
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HerbMed Image Cropper</title>
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 14px;
+  background: #f1f5f9;
+  color: #222;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.container {
+  max-width: 680px;
+  margin: auto;
+  padding: 20px;
+  background: white;
+  border-radius: 16px;
+}
+
+h1 { color: #087f5b; }
+
+p { line-height: 1.8; }
+
+button, select, input {
+  width: 100%;
+  padding: 12px;
+  margin: 7px 0;
+  border-radius: 9px;
+  font-size: 16px;
+}
+
+button {
+  background: #087f5b;
+  color: white;
+  border: 0;
+  cursor: pointer;
+}
+
+.secondary { background: #334155; }
+
+#stage {
+  position: relative;
+  display: none;
+  width: fit-content;
+  max-width: 100%;
+  margin: 15px auto;
+  line-height: 0;
+  touch-action: none;
+}
+
+#preview {
+  display: block;
+  max-width: 100%;
+  max-height: 55vh;
+  width: auto;
+  height: auto;
+}
+
+#selection {
+  position: absolute;
+  display: none;
+  border: 2px solid #00d99a;
+  background: rgba(0,217,154,0.16);
+  touch-action: none;
+}
+
+.handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #00d99a;
+  border: 2px solid white;
+  border-radius: 50%;
+  z-index: 5;
+  touch-action: none;
+}
+
+.tl { left: -10px; top: -10px; }
+.br { right: -10px; bottom: -10px; }
+
+.info {
+  padding: 10px;
+  background: #ecfdf5;
+  color: #065f46;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+a {
+  display: inline-block;
+  margin-top: 18px;
+  color: #087f5b;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>HerbMed Image Cropper</h1>
+<p>تصویر منتخب کریں اور انگلی سے Crop کا حصہ بنائیں۔</p>
+
+<input type="file" id="upload" accept="image/*">
+
+<div id="stage">
+  <canvas id="preview"></canvas>
+  <div id="selection">
+    <div class="handle tl" data-handle="tl"></div>
+    <div class="handle br" data-handle="br"></div>
+  </div>
+</div>
+
+<div id="controls" hidden>
+
+<p class="info">
+تصویر پر انگلی سے Crop کا حصہ بنائیں۔
+مستطیل کے اندر انگلی رکھ کر اسے حرکت دیں،
+اور اس کے کونوں سے سائز تبدیل کریں۔
+</p>
+
+<label>تصویر کا تناسب</label>
+<select id="ratio">
+  <option value="free">آزاد سائز</option>
+  <option value="1">1:1 مربع</option>
+  <option value="1.333333">4:3</option>
+  <option value="1.777778">16:9</option>
+  <option value="0.5625">9:16</option>
+</select>
+
+<button class="secondary" id="rotateBtn">
+تصویر 90° گھمائیں
+</button>
+
+<button class="secondary" id="resetBtn">
+Crop دوبارہ منتخب کریں
+</button>
+
+<button id="cropBtn">Crop Image</button>
+
+<label>محفوظ کرنے کا فارمیٹ</label>
+<select id="format">
+  <option value="image/png">PNG</option>
+  <option value="image/jpeg">JPG</option>
+</select>
+
+<button id="downloadBtn">Download Image</button>
+
+<p id="status" class="info"></p>
+</div>
+
+<a href="index.html">واپس ہوم پیج پر جائیں</a>
+
+</div>
+
+<script>
+const upload = document.getElementById("upload");
+const stage = document.getElementById("stage");
+const preview = document.getElementById("preview");
+const ctx = preview.getContext("2d");
+const selection = document.getElementById("selection");
+const controls = document.getElementById("controls");
+const ratioSelect = document.getElementById("ratio");
+const statusBox = document.getElementById("status");
+
+let workCanvas = document.createElement("canvas");
+let workCtx = workCanvas.getContext("2d");
+let ready = false;
+let rect = null;
+let croppedCanvas = null;
+
+let action = "";
+let startPoint = null;
+let startRect = null;
+let activeHandle = "";
+
+function message(text) {
+  statusBox.textContent = text;
+}
+
+function getRatio() {
+  return ratioSelect.value === "free"
+    ? null
+    : Number(ratioSelect.value);
+}
+
+function drawPreview() {
+  preview.width = workCanvas.width;
+  preview.height = workCanvas.height;
+
+  ctx.clearRect(0, 0, preview.width, preview.height);
+  ctx.drawImage(workCanvas, 0, 0);
+
+  stage.style.display = "block";
+  controls.hidden = false;
+  rect = null;
+  croppedCanvas = null;
+  selection.style.display = "none";
+
+  message("تصویر تیار ہے۔ اب Crop کا حصہ منتخب کریں۔");
+}
+
+upload.addEventListener("change", function() {
+  const file = this.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("درست تصویر منتخب کریں۔");
+    return;
+  }
+
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+
+  img.onload = function() {
+    workCanvas.width = img.naturalWidth;
+    workCanvas.height = img.naturalHeight;
+
+    workCtx = workCanvas.getContext("2d");
+    workCtx.drawImage(img, 0, 0);
+
+    ready = true;
+    drawPreview();
+    URL.revokeObjectURL(url);
+  };
+
+  img.onerror = function() {
+    alert("تصویر نہیں کھل سکی۔ دوسری تصویر آزمائیں۔");
+    URL.revokeObjectURL(url);
+  };
+
+  img.src = url;
+});
+
+function getPoint(e) {
+  const box = preview.getBoundingClientRect();
+
+  return {
+    x: Math.max(0, Math.min(e.clientX - box.left, box.width)),
+    y: Math.max(0, Math.min(e.clientY - box.top, box.height))
+  };
+}
+
+function showRect() {
+  if (!rect) return;
+
+  selection.style.display = "block";
+  selection.style.left = rect.x + "px";
+  selection.style.top = rect.y + "px";
+  selection.style.width = rect.w + "px";
+  selection.style.height = rect.h + "px";
+}
+
+function createRect(x, y, dx, dy) {
+  const box = preview.getBoundingClientRect();
+  const ratio = getRatio();
+
+  let w = Math.abs(dx);
+  let h = Math.abs(dy);
+
+  if (ratio) {
+    if (w > h * ratio) {
+      w = h * ratio;
+    } else {
+      h = w / ratio;
+    }
+  }
+
+  let left = dx >= 0 ? x : x - w;
+  let top = dy >= 0 ? y : y - h;
+
+  left = Math.max(0, Math.min(left, box.width - w));
+  top = Math.max(0, Math.min(top, box.height - h));
+
+  rect = {x:left, y:top, w:w, h:h};
+  showRect();
+}
+
+stage.addEventListener("pointerdown", function(e) {
+  if (!ready) return;
+
+  e.preventDefault();
+  stage.setPointerCapture(e.pointerId);
+
+  const p = getPoint(e);
+  const handle = e.target.closest(".handle");
+
+  startPoint = p;
+  startRect = rect ? {...rect} : null;
+
+  if (handle && rect) {
+    action = "resize";
+    activeHandle = handle.dataset.handle;
+  } else if (
+    rect &&
+    p.x >= rect.x &&
+    p.x <= rect.x + rect.w &&
+    p.y >= rect.y &&
+    p.y <= rect.y + rect.h
+  ) {
+    action = "move";
+  } else {
+    action = "draw";
+    createRect(p.x, p.y, 0, 0);
+  }
+});
+
+stage.addEventListener("pointermove", function(e) {
+  if (!action || !startPoint) return;
+
+  e.preventDefault();
+
+  const p = getPoint(e);
+  const box = preview.getBoundingClientRect();
+
+  if (action === "draw") {
+    createRect(
+      startPoint.x,
+      startPoint.y,
+      p.x - startPoint.x,
+      p.y - startPoint.y
+    );
+  }
+
+  if (action === "move" && startRect) {
+    let x = startRect.x + p.x - startPoint.x;
+    let y = startRect.y + p.y - startPoint.y;
+
+    x = Math.max(0, Math.min(x, box.width - startRect.w));
+    y = Math.max(0, Math.min(y, box.height - startRect.h));
+
+    rect = {...startRect, x:x, y:y};
+    showRect();
+  }
+
+  if (action === "resize" && startRect) {
+    let x, y, w, h;
+
+    if (activeHandle === "br") {
+      x = startRect.x;
+      y = startRect.y;
+      w = Math.max(8, p.x - x);
+      h = Math.max(8, p.y - y);
+    } else {
+      const right = startRect.x + startRect.w;
+      const bottom = startRect.y + startRect.h;
+
+      x = Math.min(p.x, right - 8);
+      y = Math.min(p.y, bottom - 8);
+      w = right - x;
+      h = bottom - y;
+    }
+
+    const ratio = getRatio();
+
+    if (ratio) {
+      if (w / h > ratio) {
+        w = h * ratio;
+      } else {
+        h = w / ratio;
+      }
+    }
+
+    w = Math.min(w, box.width - x);
+    h = Math.min(h, box.height - y);
+
+    rect = {x:x, y:y, w:w, h:h};
+    showRect();
+  }
+});
+
+function stopAction() {
+  action = "";
+  startPoint = null;
+  startRect = null;
+  activeHandle = "";
+}
+
+stage.addEventListener("pointerup", stopAction);
+stage.addEventListener("pointercancel", stopAction);
+
+ratioSelect.addEventListener("change", function() {
+  rect = null;
+  selection.style.display = "none";
+  croppedCanvas = null;
+  message("تناسب منتخب ہو گیا۔ اب نیا Crop حصہ بنائیں۔");
+});
+
+document.getElementById("resetBtn").addEventListener("click", function() {
+  rect = null;
+  croppedCanvas = null;
+  selection.style.display = "none";
+  message("اب تصویر پر نیا Crop حصہ بنائیں۔");
+});
+
+document.getElementById("rotateBtn").addEventListener("click", function() {
+  if (!ready) return;
+
+  const rotated = document.createElement("canvas");
+  const rctx = rotated.getContext("2d");
+
+  rotated.width = workCanvas.height;
+  rotated.height = workCanvas.width;
+
+  rctx.translate(rotated.width / 2, rotated.height / 2);
+  rctx.rotate(Math.PI / 2);
+
+  rctx.drawImage(
+    workCanvas,
+    -workCanvas.width / 2,
+    -workCanvas.height / 2
+  );
+
+  workCanvas = rotated;
+  workCtx = workCanvas.getContext("2d");
+
+  drawPreview();
+});
+
+document.getElementById("cropBtn").addEventListener("click", function() {
+  if (!ready || !rect || rect.w < 5 || rect.h < 5) {
+    alert("پہلے تصویر پر Crop کا حصہ منتخب کریں۔");
+    return;
+  }
+
+  const box = preview.getBoundingClientRect();
+
+  const scaleX = workCanvas.width / box.width;
+  const scaleY = workCanvas.height / box.height;
+
+  const sx = Math.round(rect.x * scaleX);
+  const sy = Math.round(rect.y * scaleY);
+  const sw = Math.round(rect.w * scaleX);
+  const sh = Math.round(rect.h * scaleY);
+
+  croppedCanvas = document.createElement("canvas");
+  croppedCanvas.width = sw;
+  croppedCanvas.height = sh;
+
+  const cropCtx = croppedCanvas.getContext("2d");
+
+  cropCtx.drawImage(
+    workCanvas,
+    sx, sy, sw, sh,
+    0, 0, sw, sh
+  );
+
+  message("Crop مکمل! تصویر کا سائز: " + sw + " × " + sh + " pixels");
+});
+
+document.getElementById("downloadBtn").addEventListener("click", function() {
+  if (!croppedCanvas) {
+    alert("پہلے Crop Image دبائیں۔");
+    return;
+  }
+
+  const format = document.getElementById("format").value;
+  const extension = format === "image/png" ? "png" : "jpg";
+
+  croppedCanvas.toBlob(function(blob) {
+    if (!blob) {
+      alert("تصویر محفوظ نہیں ہو سکی۔");
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "herbmed-cropped-image." + extension;
+    link.click();
+
+    setTimeout(function() {
+      URL.revokeObjectURL(url);
+    }, 1500);
+  }, format, 0.95);
+});
+</script>
+
+</body>
+</html>
