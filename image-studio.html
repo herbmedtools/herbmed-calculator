@@ -7,7 +7,7 @@
   <style>
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
     body { margin: 0; background: #eef5f0; color: #111827; padding: 14px; }
-    .app { max-width: 760px; margin: 0 auto; background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .app { max-width: 780px; margin: 0 auto; background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
     h1 { font-size: 1.25rem; margin: 0 0 12px; color: #18764f; }
     .top-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center; }
     button, .file-btn, select, input[type="text"], input[type="number"] {
@@ -26,6 +26,8 @@
     .box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px; }
     .box h3 { margin: 0 0 8px; font-size: 0.95rem; color: #18764f; }
     .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+    .check-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; font-size: 0.8rem; }
+    .check-row label { display: inline-flex; align-items: center; gap: 4px; width: auto; margin: 0; cursor: pointer; }
     label { font-size: 0.8rem; display: flex; justify-content: space-between; width: 100%; margin-bottom: 3px; }
     input[type="range"] { width: 100%; }
     input[type="color"] { width: 36px; height: 32px; border: none; background: transparent; padding: 0; cursor: pointer; }
@@ -49,8 +51,12 @@
         2nd Collage Image
         <input type="file" id="secondInput" accept="image/*" hidden />
       </label>
+      <select id="exportFormat">
+        <option value="png">Format: PNG</option>
+        <option value="jpg">Format: JPG</option>
+      </select>
       <button id="resetBtn">Reset</button>
-      <button id="downloadBtn" class="primary">Download PNG</button>
+      <button id="downloadBtn" class="primary">Download</button>
     </div>
 
     <div class="canvas-wrap">
@@ -65,9 +71,9 @@
         </div>
         <div class="row">
           <select id="textFont" style="flex:1;">
-            <option value="sans-serif">Font: Sans-Serif (Modern)</option>
-            <option value="Georgia, serif">Font: Serif (Classic)</option>
-            <option value="'Courier New', monospace">Font: Monospace (Typewriter)</option>
+            <option value="sans-serif">Font: Sans-Serif</option>
+            <option value="Georgia, serif">Font: Serif</option>
+            <option value="'Courier New', monospace">Font: Monospace</option>
             <option value="Impact, Arial Black, sans-serif">Font: Bold Display</option>
           </select>
           <select id="textPos">
@@ -79,6 +85,8 @@
         <div class="row" style="margin-bottom:4px;">
           <span style="font-size:0.78rem;">Text Color:</span>
           <input type="color" id="textColor" value="#ffffff" />
+          <span style="font-size:0.78rem;">BG Box:</span>
+          <input type="color" id="textBgColor" value="#000000" />
         </div>
         <div class="swatches" id="textSwatches">
           <button type="button" class="swatch" data-color="#ffffff" style="background:#ffffff;" title="White"></button>
@@ -87,6 +95,10 @@
           <button type="button" class="swatch" data-color="#22c55e" style="background:#22c55e;" title="Green"></button>
           <button type="button" class="swatch" data-color="#ef4444" style="background:#ef4444;" title="Red"></button>
           <button type="button" class="swatch" data-color="#38bdf8" style="background:#38bdf8;" title="Sky Blue"></button>
+        </div>
+        <div class="check-row">
+          <label><input type="checkbox" id="textBgBox" /> Text BG Box</label>
+          <label><input type="checkbox" id="textOutline" checked /> Text Outline</label>
         </div>
         <label><span>Text Size</span><span id="textSizeVal">36px</span></label>
         <input type="range" id="textSize" min="16" max="100" value="36" />
@@ -98,10 +110,17 @@
           <input type="text" id="wmText" placeholder="Watermark text (e.g. Herbmed)" style="width:100%;" />
         </div>
         <div class="row">
-          <select id="wmFont" style="width:100%;">
+          <select id="wmFont" style="flex:1;">
             <option value="sans-serif">WM Font: Sans-Serif</option>
             <option value="Georgia, serif">WM Font: Serif</option>
             <option value="'Courier New', monospace">WM Font: Monospace</option>
+          </select>
+          <select id="wmPos">
+            <option value="bottom-right">Bottom Right</option>
+            <option value="bottom-left">Bottom Left</option>
+            <option value="top-right">Top Right</option>
+            <option value="top-left">Top Left</option>
+            <option value="center">Center</option>
           </select>
         </div>
         <div class="row" style="margin-bottom:6px;">
@@ -113,12 +132,12 @@
           </label>
           <button id="clearWmBtn">Clear</button>
         </div>
-        <label><span>Watermark Opacity</span><span id="wmAlphaVal">40%</span></label>
-        <input type="range" id="wmAlpha" min="10" max="100" value="40" />
+        <label><span>Watermark Opacity</span><span id="wmAlphaVal">45%</span></label>
+        <input type="range" id="wmAlpha" min="10" max="100" value="45" />
       </div>
 
       <div class="box">
-        <h3>Collage Layout</h3>
+        <h3>Collage & Frame</h3>
         <div class="row">
           <select id="collageMode" style="width:100%;">
             <option value="single">Single Image</option>
@@ -126,9 +145,11 @@
             <option value="stack">Top & Bottom (2 Images)</option>
           </select>
         </div>
-        <p style="margin:0; font-size:0.78rem; color:#4b5563;">
-          Upload Main Image and 2nd Collage Image, then choose Side by Side or Top & Bottom.
-        </p>
+        <div class="check-row">
+          <label><input type="checkbox" id="roundedCorners" /> Rounded Corners</label>
+        </div>
+        <label><span>Collage Gap</span><span id="gapVal">0px</span></label>
+        <input type="range" id="collageGap" min="0" max="40" value="0" />
       </div>
     </div>
   </div>
@@ -144,13 +165,22 @@
     const overlayTextEl = document.getElementById("overlayText");
     const textFontEl = document.getElementById("textFont");
     const textColorEl = document.getElementById("textColor");
+    const textBgColorEl = document.getElementById("textBgColor");
+    const textBgBoxEl = document.getElementById("textBgBox");
+    const textOutlineEl = document.getElementById("textOutline");
     const textPosEl = document.getElementById("textPos");
     const textSizeEl = document.getElementById("textSize");
+
     const wmTextEl = document.getElementById("wmText");
     const wmFontEl = document.getElementById("wmFont");
+    const wmPosEl = document.getElementById("wmPos");
     const wmColorEl = document.getElementById("wmColor");
     const wmAlphaEl = document.getElementById("wmAlpha");
+
     const collageModeEl = document.getElementById("collageMode");
+    const collageGapEl = document.getElementById("collageGap");
+    const roundedCornersEl = document.getElementById("roundedCorners");
+    const exportFormatEl = document.getElementById("exportFormat");
 
     function loadFile(file, cb) {
       const reader = new FileReader();
@@ -162,9 +192,29 @@
       reader.readAsDataURL(file);
     }
 
+    function drawRoundedImage(img, x, y, w, h, radius) {
+      if (!radius) {
+        ctx.drawImage(img, x, y, w, h);
+        return;
+      }
+      const r = Math.min(radius, w / 2, h / 2);
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(img, x, y, w, h);
+      ctx.restore();
+    }
+
     function render() {
       document.getElementById("textSizeVal").textContent = textSizeEl.value + "px";
       document.getElementById("wmAlphaVal").textContent = wmAlphaEl.value + "%";
+      document.getElementById("gapVal").textContent = collageGapEl.value + "px";
 
       if (!mainImg && !secondImg) {
         canvas.width = 400;
@@ -178,6 +228,8 @@
       }
 
       const mode = collageModeEl.value;
+      const gap = Number(collageGapEl.value);
+      const radius = roundedCornersEl.checked ? 24 : 0;
       const a = mainImg || secondImg;
       const b = secondImg || mainImg;
 
@@ -185,22 +237,25 @@
         const h = Math.max(a.naturalHeight, b.naturalHeight);
         const wA = Math.round((a.naturalWidth / a.naturalHeight) * h);
         const wB = Math.round((b.naturalWidth / b.naturalHeight) * h);
-        canvas.width = wA + wB;
+        canvas.width = wA + wB + gap;
         canvas.height = h;
-        ctx.drawImage(a, 0, 0, wA, h);
-        ctx.drawImage(b, wA, 0, wB, h);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawRoundedImage(a, 0, 0, wA, h, radius);
+        drawRoundedImage(b, wA + gap, 0, wB, h, radius);
       } else if (mode === "stack" && mainImg && secondImg) {
         const w = Math.max(a.naturalWidth, b.naturalWidth);
         const hA = Math.round((a.naturalHeight / a.naturalWidth) * w);
         const hB = Math.round((b.naturalHeight / b.naturalWidth) * w);
         canvas.width = w;
-        canvas.height = hA + hB;
-        ctx.drawImage(a, 0, 0, w, hA);
-        ctx.drawImage(b, 0, hA, w, hB);
+        canvas.height = hA + hB + gap;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawRoundedImage(a, 0, 0, w, hA, radius);
+        drawRoundedImage(b, 0, hA + gap, w, hB, radius);
       } else {
         canvas.width = a.naturalWidth;
         canvas.height = a.naturalHeight;
-        ctx.drawImage(a, 0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawRoundedImage(a, 0, 0, canvas.width, canvas.height, radius);
       }
 
       // Overlay Text
@@ -209,13 +264,37 @@
         const size = Number(textSizeEl.value);
         ctx.save();
         ctx.font = `bold ${size}px ${textFontEl.value}`;
-        ctx.fillStyle = textColorEl.value;
         ctx.textAlign = "center";
-        ctx.shadowColor = "rgba(0,0,0,0.65)";
-        ctx.shadowBlur = 6;
-        let y = canvas.height - size;
-        if (textPosEl.value === "top") y = size + 16;
-        if (textPosEl.value === "center") y = canvas.height / 2 + size / 3;
+        ctx.textBaseline = "middle";
+
+        let y = canvas.height - size * 0.9;
+        if (textPosEl.value === "top") y = size * 0.9;
+        if (textPosEl.value === "center") y = canvas.height / 2;
+
+        if (textBgBoxEl.checked) {
+          const metrics = ctx.measureText(txt);
+          const padX = Math.max(12, size * 0.35);
+          const padY = Math.max(8, size * 0.22);
+          const boxW = metrics.width + padX * 2;
+          const boxH = size + padY * 2;
+          const boxX = canvas.width / 2 - boxW / 2;
+          const boxY = y - boxH / 2;
+          ctx.fillStyle = textBgColorEl.value;
+          ctx.globalAlpha = 0.78;
+          ctx.fillRect(boxX, boxY, boxW, boxH);
+          ctx.globalAlpha = 1;
+        }
+
+        ctx.shadowColor = "rgba(0,0,0,0.6)";
+        ctx.shadowBlur = 5;
+
+        if (textOutlineEl.checked) {
+          ctx.lineWidth = Math.max(2, Math.round(size / 14));
+          ctx.strokeStyle = "rgba(0,0,0,0.85)";
+          ctx.strokeText(txt, canvas.width / 2, y);
+        }
+
+        ctx.fillStyle = textColorEl.value;
         ctx.fillText(txt, canvas.width / 2, y);
         ctx.restore();
       }
@@ -223,14 +302,26 @@
       // Watermark
       const alpha = Number(wmAlphaEl.value) / 100;
       const wmTxt = wmTextEl.value.trim();
+      const wmPos = wmPosEl.value;
+
       if (wmTxt) {
         ctx.save();
         ctx.globalAlpha = alpha;
         const wmSize = Math.max(18, Math.round(canvas.width * 0.045));
         ctx.font = `bold ${wmSize}px ${wmFontEl.value}`;
         ctx.fillStyle = wmColorEl.value;
+
+        let x = canvas.width - 18;
+        let y = canvas.height - 18;
         ctx.textAlign = "right";
-        ctx.fillText(wmTxt, canvas.width - 18, canvas.height - 18);
+        ctx.textBaseline = "bottom";
+
+        if (wmPos === "bottom-left") { x = 18; y = canvas.height - 18; ctx.textAlign = "left"; }
+        if (wmPos === "top-right") { x = canvas.width - 18; y = 18; ctx.textAlign = "right"; ctx.textBaseline = "top"; }
+        if (wmPos === "top-left") { x = 18; y = 18; ctx.textAlign = "left"; ctx.textBaseline = "top"; }
+        if (wmPos === "center") { x = canvas.width / 2; y = canvas.height / 2; ctx.textAlign = "center"; ctx.textBaseline = "middle"; }
+
+        ctx.fillText(wmTxt, x, y);
         ctx.restore();
       }
 
@@ -239,7 +330,12 @@
         ctx.globalAlpha = alpha;
         const logoW = Math.round(canvas.width * 0.18);
         const logoH = Math.round((wmImg.naturalHeight / wmImg.naturalWidth) * logoW);
-        ctx.drawImage(wmImg, 16, 16, logoW, logoH);
+        let lx = 16, ly = 16;
+        if (wmPos === "top-right") { lx = canvas.width - logoW - 16; ly = 16; }
+        if (wmPos === "bottom-left") { lx = 16; ly = canvas.height - logoH - 16; }
+        if (wmPos === "bottom-right") { lx = canvas.width - logoW - 16; ly = canvas.height - logoH - 16; }
+        if (wmPos === "center") { lx = (canvas.width - logoW) / 2; ly = (canvas.height - logoH) / 2; }
+        ctx.drawImage(wmImg, lx, ly, logoW, logoH);
         ctx.restore();
       }
     }
@@ -266,7 +362,11 @@
       render();
     });
 
-    [overlayTextEl, textFontEl, textColorEl, textPosEl, textSizeEl, wmTextEl, wmFontEl, wmColorEl, wmAlphaEl, collageModeEl].forEach(el => {
+    [
+      overlayTextEl, textFontEl, textColorEl, textBgColorEl, textBgBoxEl, textOutlineEl, textPosEl, textSizeEl,
+      wmTextEl, wmFontEl, wmPosEl, wmColorEl, wmAlphaEl,
+      collageModeEl, collageGapEl, roundedCornersEl
+    ].forEach(el => {
       el.addEventListener("input", render);
       el.addEventListener("change", render);
     });
@@ -275,16 +375,20 @@
       mainImg = null; secondImg = null; wmImg = null;
       overlayTextEl.value = ""; wmTextEl.value = "";
       textFontEl.value = "sans-serif"; wmFontEl.value = "sans-serif";
-      textColorEl.value = "#ffffff"; wmColorEl.value = "#ffffff";
+      wmPosEl.value = "bottom-right";
+      textColorEl.value = "#ffffff"; textBgColorEl.value = "#000000"; wmColorEl.value = "#ffffff";
+      textBgBoxEl.checked = false; textOutlineEl.checked = true; roundedCornersEl.checked = false;
       collageModeEl.value = "single";
-      textSizeEl.value = 36; wmAlphaEl.value = 40;
+      textSizeEl.value = 36; wmAlphaEl.value = 45; collageGapEl.value = 0;
       render();
     });
 
     document.getElementById("downloadBtn").addEventListener("click", () => {
+      const fmt = exportFormatEl.value;
+      const mime = fmt === "jpg" ? "image/jpeg" : "image/png";
       const a = document.createElement("a");
-      a.download = "herbmed-image-studio.png";
-      a.href = canvas.toDataURL("image/png");
+      a.download = `herbmed-image-studio.${fmt}`;
+      a.href = canvas.toDataURL(mime, 0.92);
       a.click();
     });
 
