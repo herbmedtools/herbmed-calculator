@@ -3,26 +3,37 @@
 
   <url>
     <loc>https://herbmedtools.github.io/herbmed-calculator/</loc>
+    <lastmod>2026-11-22</lastmod>
   </url>
 
-   <url>
+  <url>
     <loc>https://herbmedtools.github.io/herbmed-calculator/calculator.html</loc>
+    <lastmod>2026-11-22</lastmod>
   </url>
 
   <url>
     <loc>https://herbmedtools.github.io/herbmed-calculator/percentage.html</loc>
+    <lastmod>2026-11-22</lastmod>
   </url>
 
   <url>
     <loc>https://herbmedtools.github.io/herbmed-calculator/image-compressor.html</loc>
+    <lastmod>2026-11-22</lastmod>
   </url>
 
   <url>
     <loc>https://herbmedtools.github.io/herbmed-calculator/image-cropper.html</loc>
+    <lastmod>2026-11-22</lastmod>
   </url>
 
   <url>
     <loc>https://herbmedtools.github.io/herbmed-calculator/image-resizer.html</loc>
+    <lastmod>2026-11-22</lastmod>
+  </url>
+
+  <url>
+    <loc>https://herbmedtools.github.io/herbmed-calculator/image-studio.html</loc>
+    <lastmod>2026-11-22</lastmod>
   </url>
 
 </urlset>
