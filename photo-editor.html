@@ -9,15 +9,24 @@
     body { margin: 0; background: #f3f4f6; color: #111827; padding: 14px; }
     .app { max-width: 740px; margin: 0 auto; background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
     h1 { font-size: 1.2rem; margin: 0 0 12px; }
-    .top-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center; }
+    .top-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; align-items: center; }
     button, .file-btn, select {
       border: none; border-radius: 8px; padding: 9px 12px; font-size: 0.88rem;
       cursor: pointer; background: #e5e7eb; color: #111827; font-weight: 600;
     }
     .file-btn { background: #2563eb; color: #fff; display: inline-block; }
     .primary { background: #059669; color: #fff; }
-    .ai-btn { background: #7c3aed; color: #fff; }
+    .tool-accent { background: #7c3aed; color: #fff; }
+    .active-mode { outline: 3px solid #f59e0b; }
     button:disabled, select:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status {
+      margin: 8px 0 12px; padding: 10px 12px; border-radius: 8px;
+      font-size: 0.88rem; font-weight: 600; background: #eff6ff; color: #1e3a8a;
+      border: 1px solid #bfdbfe;
+    }
+    .status.error {
+      background: #fef2f2; color: #991b1b; border-color: #fca5a5;
+    }
     .canvas-wrap {
       width: 100%; min-height: 240px; border: 2px dashed #cbd5e1; border-radius: 10px;
       display: flex; align-items: center; justify-content: center; overflow: auto;
@@ -29,7 +38,7 @@
       background-position: 0 0, 0 10px, 10px -10px, -10px 0;
       padding: 8px;
     }
-    canvas { max-width: 100%; height: auto; border-radius: 6px; }
+    canvas { max-width: 100%; height: auto; border-radius: 6px; touch-action: manipulation; }
     .bg-bar {
       margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
       background: #f9fafb; padding: 10px; border-radius: 10px; border: 1px solid #e5e7eb;
@@ -41,7 +50,6 @@
     .control label { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 4px; }
     input[type="range"] { width: 100%; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
-    .status { margin-top: 10px; font-size: 0.85rem; color: #4b5563; min-height: 20px; }
   </style>
 </head>
 <body>
@@ -53,10 +61,13 @@
         Upload Image
         <input type="file" id="fileInput" accept="image/*" hidden />
       </label>
-      <button id="removeBgBtn" class="ai-btn" disabled>Remove Background</button>
+      <button id="magicEraseBtn" class="tool-accent" disabled>Tap BG to Remove</button>
+      <button id="removeWhiteBtn" disabled>Remove Light BG</button>
       <button id="resetBtn" disabled>Reset</button>
       <button id="downloadBtn" class="primary" disabled>Download PNG</button>
     </div>
+
+    <div class="status" id="status">Select an image to begin.</div>
 
     <div class="canvas-wrap">
       <canvas id="canvas"></canvas>
@@ -92,6 +103,10 @@
 
     <div class="panel">
       <div class="control">
+        <label><span>Tolerance</span><span id="tolVal">35</span></label>
+        <input type="range" id="tolerance" min="5" max="120" value="35" disabled />
+      </div>
+      <div class="control">
         <label><span>Brightness</span><span id="brightVal">100%</span></label>
         <input type="range" id="brightness" min="0" max="200" value="100" disabled />
       </div>
@@ -108,26 +123,26 @@
         <input type="range" id="opacity" min="10" max="100" value="100" disabled />
       </div>
     </div>
-
-    <div class="status" id="status">Select an image to begin.</div>
   </div>
 
-  <script type="module">
-    import { removeBackground } from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm";
-
+  <script>
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
     const statusEl = document.getElementById("status");
     const bgColorInput = document.getElementById("bgColor");
     const cropRatioSelect = document.getElementById("cropRatio");
+    const magicEraseBtn = document.getElementById("magicEraseBtn");
 
+    let originalImg = null;
     let sourceImg = null;
     let bgImg = null;
-    let bgColor = null; // null means transparent unless set
+    let bgColor = null;
+    let tapEraseMode = false;
     let flipH = 1, flipV = 1, rotation = 0;
     let grayscale = false, invert = false, sepia = false;
 
     const sliders = {
+      tolerance: document.getElementById("tolerance"),
       brightness: document.getElementById("brightness"),
       contrast: document.getElementById("contrast"),
       blur: document.getElementById("blur"),
@@ -135,11 +150,16 @@
     };
 
     const buttons = [
-      "removeBgBtn", "resetBtn", "downloadBtn",
+      "magicEraseBtn", "removeWhiteBtn", "resetBtn", "downloadBtn",
       "solidBgBtn", "transparentBgBtn", "whiteBgBtn", "blackBgBtn",
       "flipHBtn", "flipVBtn", "rotateBtn",
       "grayscaleBtn", "invertBtn", "sepiaBtn"
     ].map(id => document.getElementById(id));
+
+    function setStatus(msg, isError = false) {
+      statusEl.textContent = msg;
+      statusEl.classList.toggle("error", isError);
+    }
 
     function setControlsEnabled(enabled) {
       buttons.forEach(b => b.disabled = !enabled);
@@ -149,6 +169,7 @@
     }
 
     function updateLabels() {
+      document.getElementById("tolVal").textContent = sliders.tolerance.value;
       document.getElementById("brightVal").textContent = sliders.brightness.value + "%";
       document.getElementById("contrastVal").textContent = sliders.contrast.value + "%";
       document.getElementById("blurVal").textContent = sliders.blur.value + "px";
@@ -216,7 +237,6 @@
       ctx.rotate((rotation * Math.PI) / 180);
       ctx.scale(flipH, flipV);
 
-      // Fit or center-crop cleanly inside outW x outH
       const imgW = sourceImg.naturalWidth;
       const imgH = sourceImg.naturalHeight;
       const drawW = swap ? imgH : imgW;
@@ -238,33 +258,99 @@
       reader.onload = () => {
         const img = new Image();
         img.onload = () => onLoad(img);
+        img.onerror = () => setStatus("Could not load selected image.", true);
         img.src = reader.result;
       };
+      reader.onerror = () => setStatus("Failed to read file.", true);
       reader.readAsDataURL(file);
     }
 
     function resetAllState() {
+      sourceImg = originalImg;
       bgImg = null;
       bgColor = null;
+      tapEraseMode = false;
+      magicEraseBtn.classList.remove("active-mode");
       cropRatioSelect.value = "full";
       flipH = 1; flipV = 1; rotation = 0;
       grayscale = false; invert = false; sepia = false;
+      sliders.tolerance.value = 35;
       sliders.brightness.value = 100;
       sliders.contrast.value = 100;
       sliders.blur.value = 0;
       sliders.opacity.value = 100;
     }
 
+    function applyColorRemoval(targetR, targetG, targetB, tol) {
+      const work = document.createElement("canvas");
+      work.width = sourceImg.naturalWidth;
+      work.height = sourceImg.naturalHeight;
+      const wCtx = work.getContext("2d");
+      wCtx.drawImage(sourceImg, 0, 0);
+
+      const imgData = wCtx.getImageData(0, 0, work.width, work.height);
+      const data = imgData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+        const dist = Math.sqrt(
+          (r - targetR) * (r - targetR) +
+          (g - targetG) * (g - targetG) +
+          (b - targetB) * (b - targetB)
+        );
+        if (dist <= tol) {
+          data[i + 3] = 0;
+        }
+      }
+
+      wCtx.putImageData(imgData, 0, 0);
+      const updated = new Image();
+      updated.onload = () => {
+        sourceImg = updated;
+        render();
+      };
+      updated.src = work.toDataURL("image/png");
+    }
+
     document.getElementById("fileInput").addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (!file) return;
       loadImageFromFile(file, (img) => {
+        originalImg = img;
         sourceImg = img;
         resetAllState();
         setControlsEnabled(true);
-        statusEl.textContent = "Image loaded. Ready to edit.";
+        setStatus("Image loaded. Use 'Tap BG to Remove' or 'Remove Light BG'.");
         render();
       });
+    });
+
+    magicEraseBtn.addEventListener("click", () => {
+      tapEraseMode = !tapEraseMode;
+      magicEraseBtn.classList.toggle("active-mode", tapEraseMode);
+      setStatus(
+        tapEraseMode
+          ? "Tap on the background color on the image to erase it."
+          : "Tap-to-erase turned off."
+      );
+    });
+
+    canvas.addEventListener("click", (e) => {
+      if (!tapEraseMode || !sourceImg) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.floor(((e.clientX - rect.left) / rect.width) * canvas.width);
+      const y = Math.floor(((e.clientY - rect.top) / rect.height) * canvas.height);
+      const pixel = ctx.getImageData(x, y, 1, 1).data;
+      const tol = Number(sliders.tolerance.value);
+      applyColorRemoval(pixel[0], pixel[1], pixel[2], tol);
+      setStatus(`Erased color near RGB(${pixel[0]}, ${pixel[1]}, ${pixel[2]}).`);
+    });
+
+    document.getElementById("removeWhiteBtn").addEventListener("click", () => {
+      if (!sourceImg) return;
+      const tol = Math.max(Number(sliders.tolerance.value), 55);
+      applyColorRemoval(255, 255, 255, tol);
+      setStatus("Light/white background removed. Adjust Tolerance if needed.");
     });
 
     document.getElementById("bgInput").addEventListener("change", (e) => {
@@ -301,32 +387,6 @@
       render();
     });
 
-    document.getElementById("removeBgBtn").addEventListener("click", async () => {
-      if (!sourceImg) return;
-      try {
-        statusEl.textContent = "Removing background (first run may download AI model)...";
-        const tempCanvas = document.createElement("canvas");
-        tempCanvas.width = sourceImg.naturalWidth;
-        tempCanvas.height = sourceImg.naturalHeight;
-        tempCanvas.getContext("2d").drawImage(sourceImg, 0, 0);
-
-        const blob = await new Promise(res => tempCanvas.toBlob(res, "image/png"));
-        const resultBlob = await removeBackground(blob);
-        const url = URL.createObjectURL(resultBlob);
-
-        const cleanImg = new Image();
-        cleanImg.onload = () => {
-          sourceImg = cleanImg;
-          URL.revokeObjectURL(url);
-          statusEl.textContent = "Background removed!";
-          render();
-        };
-        cleanImg.src = url;
-      } catch (err) {
-        statusEl.textContent = "Background removal failed: " + err.message;
-      }
-    });
-
     cropRatioSelect.addEventListener("change", render);
     document.getElementById("flipHBtn").addEventListener("click", () => { flipH *= -1; render(); });
     document.getElementById("flipVBtn").addEventListener("click", () => { flipV *= -1; render(); });
@@ -340,6 +400,7 @@
     document.getElementById("resetBtn").addEventListener("click", () => {
       resetAllState();
       render();
+      setStatus("Reset to original image.");
     });
 
     document.getElementById("downloadBtn").addEventListener("click", () => {
