@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Text, Watermark & Collage Maker</title>
+  <title>Text, Watermark &amp; Collage Maker – Free Online Image Studio | HerbMed Tools</title>
+  <meta name="description" content="Add text with custom fonts and colors, apply text or logo watermarks, and create side-by-side or top-bottom photo collages online for free." />
   <style>
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
     body { margin: 0; background: #eef5f0; color: #111827; padding: 14px; }
@@ -40,7 +41,7 @@
 </head>
 <body>
   <div class="app">
-    <h1>Text, Watermark & Collage Maker</h1>
+    <h1>Text, Watermark &amp; Collage Maker</h1>
 
     <div class="top-bar">
       <label class="file-btn">
@@ -137,12 +138,12 @@
       </div>
 
       <div class="box">
-        <h3>Collage & Frame</h3>
+        <h3>Collage &amp; Frame</h3>
         <div class="row">
           <select id="collageMode" style="width:100%;">
             <option value="single">Single Image</option>
             <option value="side">Side by Side (2 Images)</option>
-            <option value="stack">Top & Bottom (2 Images)</option>
+            <option value="stack">Top &amp; Bottom (2 Images)</option>
           </select>
         </div>
         <div class="check-row">
@@ -211,7 +212,7 @@
       ctx.restore();
     }
 
-    function render() {
+    function render(whiteBgForJpg = false) {
       document.getElementById("textSizeVal").textContent = textSizeEl.value + "px";
       document.getElementById("wmAlphaVal").textContent = wmAlphaEl.value + "%";
       document.getElementById("gapVal").textContent = collageGapEl.value + "px";
@@ -220,6 +221,10 @@
         canvas.width = 400;
         canvas.height = 220;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (whiteBgForJpg) {
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
         ctx.fillStyle = "#6b7280";
         ctx.font = "15px sans-serif";
         ctx.textAlign = "center";
@@ -239,22 +244,36 @@
         const wB = Math.round((b.naturalWidth / b.naturalHeight) * h);
         canvas.width = wA + wB + gap;
         canvas.height = h;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawRoundedImage(a, 0, 0, wA, h, radius);
-        drawRoundedImage(b, wA + gap, 0, wB, h, radius);
       } else if (mode === "stack" && mainImg && secondImg) {
         const w = Math.max(a.naturalWidth, b.naturalWidth);
         const hA = Math.round((a.naturalHeight / a.naturalWidth) * w);
         const hB = Math.round((b.naturalHeight / b.naturalWidth) * w);
         canvas.width = w;
         canvas.height = hA + hB + gap;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawRoundedImage(a, 0, 0, w, hA, radius);
-        drawRoundedImage(b, 0, hA + gap, w, hB, radius);
       } else {
         canvas.width = a.naturalWidth;
         canvas.height = a.naturalHeight;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (whiteBgForJpg) {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      if (mode === "side" && mainImg && secondImg) {
+        const h = canvas.height;
+        const wA = Math.round((a.naturalWidth / a.naturalHeight) * h);
+        const wB = Math.round((b.naturalWidth / b.naturalHeight) * h);
+        drawRoundedImage(a, 0, 0, wA, h, radius);
+        drawRoundedImage(b, wA + gap, 0, wB, h, radius);
+      } else if (mode === "stack" && mainImg && secondImg) {
+        const w = canvas.width;
+        const hA = Math.round((a.naturalHeight / a.naturalWidth) * w);
+        const hB = Math.round((b.naturalHeight / b.naturalWidth) * w);
+        drawRoundedImage(a, 0, 0, w, hA, radius);
+        drawRoundedImage(b, 0, hA + gap, w, hB, radius);
+      } else {
         drawRoundedImage(a, 0, 0, canvas.width, canvas.height, radius);
       }
 
@@ -367,8 +386,8 @@
       wmTextEl, wmFontEl, wmPosEl, wmColorEl, wmAlphaEl,
       collageModeEl, collageGapEl, roundedCornersEl
     ].forEach(el => {
-      el.addEventListener("input", render);
-      el.addEventListener("change", render);
+      el.addEventListener("input", () => render());
+      el.addEventListener("change", () => render());
     });
 
     document.getElementById("resetBtn").addEventListener("click", () => {
@@ -385,11 +404,14 @@
 
     document.getElementById("downloadBtn").addEventListener("click", () => {
       const fmt = exportFormatEl.value;
-      const mime = fmt === "jpg" ? "image/jpeg" : "image/png";
+      const isJpg = fmt === "jpg";
+      if (isJpg) render(true);
+      const mime = isJpg ? "image/jpeg" : "image/png";
       const a = document.createElement("a");
       a.download = `herbmed-image-studio.${fmt}`;
       a.href = canvas.toDataURL(mime, 0.92);
       a.click();
+      if (isJpg) render(false);
     });
 
     render();
