@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ٹیکسٹ کیس کنورٹر | Text Case Converter</title>
+    <meta name="description" content="انگریزی متن کو UPPERCASE، lowercase، Title Case اور Sentence case میں تبدیل کریں، فالتو اسپیس صاف کریں اور الفاظ گنیں۔">
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-dark: #115e59;
+            --primary-light: #ccfbf1;
+            --bg: #f0fdfa;
+            --card: #ffffff;
+            --text: #134e4a;
+            --muted: #64748b;
+            --border: #cbd5e1;
+            --soft: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(15, 118, 110, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        header {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
+        }
+
+        header h1 {
+            font-size: 1.15rem;
+            color: var(--primary);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            border-radius: 14px;
+            border: 1.5px solid var(--border);
+            font-size: 0.98rem;
+            background: var(--soft);
+            color: var(--text);
+            line-height: 1.6;
+            outline: none;
+            resize: vertical;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.84rem;
+        }
+
+        .stats-bar strong {
+            display: block;
+            font-size: 1rem;
+            color: var(--primary-dark);
+            margin-top: 2px;
+        }
+
+        .case-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .case-btn {
+            padding: 11px 10px;
+            border: 1.5px solid var(--border);
+            background: #ffffff;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .case-btn:active {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .case-btn.full {
+            grid-column: span 2;
+            background: #f8fafc;
+        }
+
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 10px;
+            border: none;
+            border-radius: 14px;
+            font-size: 0.96rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-copy {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-clear {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-msg {
+            text-align: center;
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            min-height: 20px;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 16px;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🔤 ٹیکسٹ کیس کنورٹر</h1>
+        </header>
+
+        <textarea id="textInput" placeholder="یہاں اپنا انگریزی یا اردو متن لکھیں یا پیسٹ کریں..." oninput="onTextChange()"></textarea>
+
+        <div class="stats-bar">
+            <div>الفاظ<strong id="wordCount">0</strong></div>
+            <div>حروف<strong id="charCount">0</strong></div>
+            <div>لائنز<strong id="lineCount">0</strong></div>
+        </div>
+
+        <div class="case-grid">
+            <button type="button" class="case-btn" onclick="applyCase('upper')">UPPERCASE</button>
+            <button type="button" class="case-btn" onclick="applyCase('lower')">lowercase</button>
+            <button type="button" class="case-btn" onclick="applyCase('title')">Title Case</button>
+            <button type="button" class="case-btn" onclick="applyCase('sentence')">Sentence case</button>
+            <button type="button" class="case-btn full" onclick="applyCase('clean')">🧹 فالتو اسپیس صاف کریں</button>
+        </div>
+
+        <div class="action-row">
+            <button type="button" class="btn btn-copy" onclick="copyText()">📋 متن کاپی کریں</button>
+            <button type="button" class="btn btn-clear" onclick="clearText()">↺ صاف کریں</button>
+        </div>
+
+        <div class="status-msg" id="statusMsg"></div>
+    </div>
+
+    <footer>
+        <a href="index.html">← تمام ٹولز پر واپس جائیں</a>
+    </footer>
+
+    <script>
+        function updateStats() {
+            const val = document.getElementById('textInput').value;
+            const trimmed = val.trim();
+            const words = trimmed ? trimmed.split(/\s+/).length : 0;
+            const chars = val.length;
+            const lines = val ? val.split(/\r\n|\r|\n/).length : 0;
+
+            document.getElementById('wordCount').innerText = words;
+            document.getElementById('charCount').innerText = chars;
+            document.getElementById('lineCount').innerText = lines;
+        }
+
+        function saveText(val) {
+            try {
+                localStorage.setItem('herbmed_text_case_v1', val);
+            } catch (e) {}
+        }
+
+        function loadText() {
+            try {
+                const saved = localStorage.getItem('herbmed_text_case_v1');
+                if (saved) {
+                    document.getElementById('textInput').value = saved;
+                }
+            } catch (e) {}
+            updateStats();
+        }
+
+        function onTextChange() {
+            const val = document.getElementById('textInput').value;
+            document.getElementById('statusMsg').innerText = '';
+            updateStats();
+            saveText(val);
+        }
+
+        function toTitleCase(str) {
+            return str.toLowerCase().replace(/\b([a-z])/g, (ch) => ch.toUpperCase());
+        }
+
+        function toSentenceCase(str) {
+            const lower = str.toLowerCase();
+            return lower.replace(/(^\s*|[.!?]\s+)([a-z])/g, (match, prefix, ch) => prefix + ch.toUpperCase());
+        }
+
+        function cleanExtraSpaces(str) {
+            return str
+                .split(/\r\n|\r|\n/)
+                .map(line => line.replace(/[ \t]+/g, ' ').trim())
+                .join('\n')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+        }
+
+        function applyCase(mode) {
+            const area = document.getElementById('textInput');
+            let text = area.value;
+            if (!text.trim()) {
+                document.getElementById('statusMsg').innerText = 'پہلے کچھ متن درج کریں۔';
+                return;
+            }
+
+            if (mode === 'upper') {
+                text = text.toUpperCase();
+            } else if (mode === 'lower') {
+                text = text.toLowerCase();
+            } else if (mode === 'title') {
+                text = toTitleCase(text);
+            } else if (mode === 'sentence') {
+                text = toSentenceCase(text);
+            } else if (mode === 'clean') {
+                text = cleanExtraSpaces(text);
+            }
+
+            area.value = text;
+            updateStats();
+            saveText(text);
+            document.getElementById('statusMsg').innerText = 'متن تبدیل ہو گیا ہے';
+        }
+
+        function copyText() {
+            const text = document.getElementById('textInput').value;
+            if (!text) {
+                document.getElementById('statusMsg').innerText = 'کاپی کرنے کے لیے کوئی متن موجود نہیں۔';
+                return;
+            }
+            const doneMsg = 'متن کاپی ہو گیا ہے';
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        document.getElementById('statusMsg').innerText = doneMsg;
+                    }).catch(() => fallbackCopy(text, doneMsg));
+                } else {
+                    fallbackCopy(text, doneMsg);
+                }
+            } catch (e) {
+                fallbackCopy(text, doneMsg);
+            }
+        }
+
+        function fallbackCopy(text, doneMsg) {
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                document.getElementById('statusMsg').innerText = doneMsg;
+            } catch (e) {
+                document.getElementById('statusMsg').innerText = 'کاپی ممکن نہیں ہو سکا';
+            }
+        }
+
+        function clearText() {
+            document.getElementById('textInput').value = '';
+            document.getElementById('statusMsg').innerText = '';
+            updateStats();
+            saveText('');
+        }
+
+        loadText();
+    </script>
+</body>
+</html>
