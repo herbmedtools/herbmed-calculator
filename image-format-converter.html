@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>امیج فارمیٹ کنورٹر | Image Format Converter</title>
+    <meta name="description" content="تصاویر کو PNG، JPG اور WebP فارمیٹس میں تبدیل کریں اور براہِ راست ڈاؤن لوڈ کریں۔">
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-dark: #115e59;
+            --primary-light: #ccfbf1;
+            --bg: #f0fdfa;
+            --card: #ffffff;
+            --text: #134e4a;
+            --muted: #64748b;
+            --border: #cbd5e1;
+            --soft: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 460px;
+            background: var(--card);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(15, 118, 110, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        header {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
+        }
+
+        header h1 {
+            font-size: 1.15rem;
+            color: var(--primary);
+        }
+
+        .upload-box {
+            border: 2px dashed var(--primary);
+            background: #f0fdfa;
+            border-radius: 16px;
+            padding: 18px 14px;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .upload-box strong {
+            font-size: 1rem;
+            color: var(--primary-dark);
+        }
+
+        .upload-box span {
+            font-size: 0.84rem;
+            color: var(--muted);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            font-size: 0.98rem;
+            background: var(--soft);
+            color: var(--text);
+            font-weight: 600;
+            outline: none;
+        }
+
+        .quality-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary);
+        }
+
+        .preview-box {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            background: var(--soft);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 12px;
+        }
+
+        .preview-box.visible {
+            display: flex;
+        }
+
+        .preview-img {
+            width: 100%;
+            max-height: 220px;
+            object-fit: contain;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+        }
+
+        .meta-info {
+            font-size: 0.84rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .btn-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 13px 10px;
+            border: none;
+            border-radius: 14px;
+            font-size: 0.96rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-download {
+            background: #16a34a;
+            color: #ffffff;
+        }
+
+        .btn-reset {
+            background: #f1f5f9;
+            color: var(--text);
+        }
+
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .status-msg {
+            text-align: center;
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            min-height: 20px;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 16px;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🖼️ امیج فارمیٹ کنورٹر</h1>
+        </header>
+
+        <label class="upload-box" for="imageInput">
+            <strong>📁 تصویر منتخب کریں</strong>
+            <span>PNG، JPG، JPEG یا WebP فائل چنیں</span>
+            <input type="file" id="imageInput" accept="image/*" onchange="handleFileSelect(event)">
+        </label>
+
+        <div class="form-group">
+            <label for="targetFormat">مطلوبہ فارمیٹ:</label>
+            <select id="targetFormat" onchange="toggleQualityRow()">
+                <option value="image/webp" selected>WebP (ویب اور بلاگ کے لیے ہلکا)</option>
+                <option value="image/jpeg">JPG / JPEG</option>
+                <option value="image/png">PNG (شفاف پس منظر کے لیے موزوں)</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="qualityGroup">
+            <div class="quality-row">
+                <span>کوالٹی:</span>
+                <span id="qualityVal">85%</span>
+            </div>
+            <input type="range" id="qualityRange" min="10" max="100" value="85" oninput="updateQualityLabel()">
+        </div>
+
+        <div class="preview-box" id="previewBox">
+            <img id="previewImg" class="preview-img" alt="Preview">
+            <div class="meta-info" id="metaInfo"></div>
+        </div>
+
+        <div class="btn-row">
+            <button type="button" id="convertBtn" class="btn btn-primary" onclick="convertImage()" disabled>🔄 تبدیل کریں</button>
+            <button type="button" id="downloadBtn" class="btn btn-download" onclick="downloadConverted()" disabled>⬇ ڈاؤن لوڈ</button>
+        </div>
+
+        <button type="button" class="btn btn-reset" onclick="resetTool()">↺ صاف کریں</button>
+
+        <div class="status-msg" id="statusMsg"></div>
+    </div>
+
+    <footer>
+        <a href="index.html">← تمام ٹولز پر واپس جائیں</a>
+    </footer>
+
+    <script>
+        let loadedImg = null;
+        let originalName = "converted-image";
+        let originalSizeKB = 0;
+        let convertedDataUrl = "";
+        let convertedExt = "webp";
+
+        function updateQualityLabel() {
+            const val = document.getElementById('qualityRange').value;
+            document.getElementById('qualityVal').innerText = `${val}%`;
+        }
+
+        function toggleQualityRow() {
+            const fmt = document.getElementById('targetFormat').value;
+            document.getElementById('qualityGroup').style.display = (fmt === 'image/png') ? 'none' : 'flex';
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            const base = file.name.replace(/\.[^/.]+$/, "");
+            originalName = base || "image";
+            originalSizeKB = (file.size / 1024).toFixed(1);
+            convertedDataUrl = "";
+            document.getElementById('downloadBtn').disabled = true;
+            document.getElementById('statusMsg').innerText = '';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    loadedImg = img;
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('previewBox').classList.add('visible');
+                    document.getElementById('metaInfo').innerText =
+                        `اصل سائز: ${originalSizeKB} KB | طول و عرض: ${img.width} × ${img.height} px`;
+                    document.getElementById('convertBtn').disabled = false;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function convertImage() {
+            if (!loadedImg) return;
+            try {
+                const mime = document.getElementById('targetFormat').value;
+                const quality = parseInt(document.getElementById('qualityRange').value, 10) / 100;
+
+                const canvas = document.createElement('canvas');
+                canvas.width = loadedImg.width;
+                canvas.height = loadedImg.height;
+                const ctx = canvas.getContext('2d');
+
+                if (mime === 'image/jpeg') {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+
+                ctx.drawImage(loadedImg, 0, 0);
+
+                if (mime === 'image/png') {
+                    convertedDataUrl = canvas.toDataURL('image/png');
+                    convertedExt = 'png';
+                } else if (mime === 'image/jpeg') {
+                    convertedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    convertedExt = 'jpg';
+                } else {
+                    convertedDataUrl = canvas.toDataURL('image/webp', quality);
+                    convertedExt = 'webp';
+                }
+
+                const approxBytes = Math.round((convertedDataUrl.length * 3) / 4);
+                const newSizeKB = (approxBytes / 1024).toFixed(1);
+
+                document.getElementById('previewImg').src = convertedDataUrl;
+                document.getElementById('metaInfo').innerText =
+                    `نیا فارمیٹ: .${convertedExt.toUpperCase()} | اندازاً سائز: ${newSizeKB} KB (اصل: ${originalSizeKB} KB)`;
+                document.getElementById('downloadBtn').disabled = false;
+                document.getElementById('statusMsg').innerText = 'تصویر کامیابی سے تبدیل ہو گئی ہے';
+            } catch (err) {
+                document.getElementById('statusMsg').innerText = 'تبدیل کرنے میں مسئلہ پیش آیا';
+            }
+        }
+
+        function downloadConverted() {
+            if (!convertedDataUrl) return;
+            try {
+                const a = document.createElement('a');
+                a.href = convertedDataUrl;
+                a.download = `${originalName}-converted.${convertedExt}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                document.getElementById('statusMsg').innerText = 'ڈاؤن لوڈ شروع ہو گئی ہے';
+            } catch (err) {
+                document.getElementById('statusMsg').innerText = 'ڈاؤن لوڈ ممکن نہیں ہو سکا';
+            }
+        }
+
+        function resetTool() {
+            loadedImg = null;
+            convertedDataUrl = "";
+            document.getElementById('imageInput').value = "";
+            document.getElementById('previewBox').classList.remove('visible');
+            document.getElementById('previewImg').src = "";
+            document.getElementById('metaInfo').innerText = "";
+            document.getElementById('convertBtn').disabled = true;
+            document.getElementById('downloadBtn').disabled = true;
+            document.getElementById('statusMsg').innerText = "";
+        }
+
+        toggleQualityRow();
+        updateQualityLabel();
+    </script>
+</body>
+</html>
