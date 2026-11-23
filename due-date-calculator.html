@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ڈیلیوری ڈیٹ کیلکولیٹر | Due Date Calculator</title>
+    <meta name="description" content="آخری ماہواری کی تاریخ سے متوقع ڈیلیوری کی تاریخ، موجودہ ہفتے اور اہم مراحل معلوم کریں۔">
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-dark: #115e59;
+            --primary-light: #ccfbf1;
+            --bg: #f0fdfa;
+            --card: #ffffff;
+            --text: #134e4a;
+            --muted: #64748b;
+            --border: #cbd5e1;
+            --soft: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 460px;
+            background: var(--card);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(15, 118, 110, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        header {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
+        }
+
+        header h1 {
+            font-size: 1.15rem;
+            color: var(--primary);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        input[type="date"], select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            font-size: 1rem;
+            background: var(--soft);
+            color: var(--text);
+            font-weight: 600;
+            outline: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .result-card {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .result-card.visible {
+            display: flex;
+        }
+
+        .due-banner {
+            background: linear-gradient(135deg, #0f766e, #115e59);
+            color: #ffffff;
+            border-radius: 18px;
+            padding: 20px 14px;
+            text-align: center;
+        }
+
+        .due-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 6px;
+        }
+
+        .due-date-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-box {
+            background: var(--soft);
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-title {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .stat-val {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        .note-box {
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            border-radius: 14px;
+            padding: 12px;
+            font-size: 0.85rem;
+            line-height: 1.55;
+            color: #334155;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 16px;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🗓️ ڈیلیوری ڈیٹ کیلکولیٹر</h1>
+        </header>
+
+        <div class="form-group">
+            <label for="lmpDate">آخری ماہواری کی پہلی تاریخ (LMP):</label>
+            <input type="date" id="lmpDate">
+        </div>
+
+        <div class="form-group">
+            <label for="cycleDays">عام سائیکل کے دن:</label>
+            <select id="cycleDays">
+                <option value="28" selected>28 دن (عام)</option>
+                <option value="25">25 دن</option>
+                <option value="26">26 دن</option>
+                <option value="27">27 دن</option>
+                <option value="29">29 دن</option>
+                <option value="30">30 دن</option>
+                <option value="32">32 دن</option>
+                <option value="35">35 دن</option>
+            </select>
+        </div>
+
+        <button type="button" class="btn" onclick="calculateDueDate()">حساب لگائیں</button>
+
+        <div class="result-card" id="resultCard">
+            <div class="due-banner">
+                <div class="due-label">متوقع ڈیلیوری کی تاریخ</div>
+                <div class="due-date-text" id="dueDateText">-</div>
+                <div id="remainingText" style="font-size:0.88rem; opacity:0.92;"></div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-title">موجودہ مدت</div>
+                    <div class="stat-val" id="gestationText">-</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-title">موجودہ سہ ماہی</div>
+                    <div class="stat-val" id="trimesterText">-</div>
+                </div>
+            </div>
+
+            <div class="note-box">
+                <strong>نوٹ:</strong> یہ اندازاً حساب ہے جو معیاری طبی فارمولے پر مبنی ہے۔ درست تاریخ اور طبی رہنمائی کے لیے مستند ڈاکٹر یا الٹراساؤنڈ رپورٹ سے مشورہ ضرور کریں۔
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <a href="index.html">← تمام ٹولز پر واپس جائیں</a>
+    </footer>
+
+    <script>
+        const urduMonths = [
+            "جنوری", "فروری", "مارچ", "اپریل", "مئی", "جون",
+            "جولائی", "اگست", "ستمبر", "اکتوبر", "نومبر", "دسمبر"
+        ];
+
+        function formatUrduDate(dateObj) {
+            const d = dateObj.getDate();
+            const m = urduMonths[dateObj.getMonth()];
+            const y = dateObj.getFullYear();
+            return `${d} ${m} ${y}`;
+        }
+
+        function saveInput(lmpStr, cycleStr) {
+            try {
+                localStorage.setItem('herbmed_due_calc_v1', JSON.stringify({ lmpStr, cycleStr }));
+            } catch (e) {}
+        }
+
+        function loadInput() {
+            try {
+                const raw = localStorage.getItem('herbmed_due_calc_v1');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed.lmpStr) document.getElementById('lmpDate').value = parsed.lmpStr;
+                    if (parsed.cycleStr) document.getElementById('cycleDays').value = parsed.cycleStr;
+                }
+            } catch (e) {}
+        }
+
+        function calculateDueDate() {
+            const lmpInput = document.getElementById('lmpDate').value;
+            const cycleDays = parseInt(document.getElementById('cycleDays').value, 10) || 28;
+            if (!lmpInput) {
+                alert('براہ کرم تاریخ منتخب کریں۔');
+                return;
+            }
+
+            const parts = lmpInput.split('-');
+            const lmpDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            const cycleAdjustment = cycleDays - 28;
+            const dueDate = new Date(lmpDate.getTime());
+            dueDate.setDate(dueDate.getDate() + 280 + cycleAdjustment);
+
+            const today = new Date();
+            const todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const lmpMid = new Date(lmpDate.getFullYear(), lmpDate.getMonth(), lmpDate.getDate());
+            const dueMid = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+
+            const diffDaysFromLmp = Math.floor((todayMid - lmpMid) / (1000 * 60 * 60 * 24));
+            const weeks = Math.max(0, Math.floor(diffDaysFromLmp / 7));
+            const remDays = Math.max(0, diffDaysFromLmp % 7);
+
+            let trimester = "پہلی سہ ماہی";
+            if (weeks >= 27) {
+                trimester = "تیسری سہ ماہی";
+            } else if (weeks >= 14) {
+                trimester = "دوسری سہ ماہی";
+            }
+
+            const daysLeft = Math.ceil((dueMid - todayMid) / (1000 * 60 * 60 * 24));
+            let remMsg = "";
+            if (daysLeft > 0) {
+                remMsg = `متوقع تاریخ میں تقریباً ${daysLeft} دن باقی ہیں`;
+            } else if (daysLeft === 0) {
+                remMsg = "آج متوقع تاریخ ہے";
+            } else {
+                remMsg = `متوقع تاریخ سے ${Math.abs(daysLeft)} دن گزر چکے ہیں`;
+            }
+
+            document.getElementById('dueDateText').innerText = formatUrduDate(dueDate);
+            document.getElementById('remainingText').innerText = remMsg;
+            document.getElementById('gestationText').innerText = `${weeks} ہفتے، ${remDays} دن`;
+            document.getElementById('trimesterText').innerText = trimester;
+            document.getElementById('resultCard').classList.add('visible');
+
+            saveInput(lmpInput, String(cycleDays));
+        }
+
+        loadInput();
+    </script>
+</body>
+</html>
