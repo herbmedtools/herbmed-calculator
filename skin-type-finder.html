@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>سکن ٹائپ فائنڈر | Skin Type Finder</title>
+    <meta name="description" content="چند آسان سوالات کے ذریعے اپنی جلد کی قسم (آئلی، خشک، کمبینیشن یا نارمل) معلوم کریں اور دیکھ بھال کے نکات جانیں۔">
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-dark: #115e59;
+            --primary-light: #ccfbf1;
+            --bg: #f0fdfa;
+            --card: #ffffff;
+            --text: #134e4a;
+            --muted: #64748b;
+            --border: #cbd5e1;
+            --soft: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(15, 118, 110, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
+        }
+
+        header h1 {
+            font-size: 1.15rem;
+            color: var(--primary);
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            background: var(--primary-light);
+            padding: 5px 10px;
+            border-radius: 999px;
+        }
+
+        .progress-bar-wrap {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #14b8a6, #0f766e);
+            transition: width 0.25s ease;
+        }
+
+        .question-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .question-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.5;
+            color: var(--text);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-btn {
+            width: 100%;
+            text-align: right;
+            background: var(--soft);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 13px 14px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            line-height: 1.45;
+            transition: all 0.15s ease;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: #f0fdfa;
+        }
+
+        .option-btn.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #ffffff;
+        }
+
+        .nav-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 13px 12px;
+            border: none;
+            border-radius: 14px;
+            font-size: 0.98rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: var(--text);
+        }
+
+        .result-box {
+            display: none;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .result-box.visible {
+            display: flex;
+        }
+
+        .result-banner {
+            background: linear-gradient(135deg, #0f766e, #115e59);
+            color: #ffffff;
+            border-radius: 18px;
+            padding: 20px 16px;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 6px;
+        }
+
+        .result-type {
+            font-size: 1.65rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .result-summary {
+            font-size: 0.92rem;
+            line-height: 1.55;
+            opacity: 0.95;
+        }
+
+        .tips-card {
+            background: var(--soft);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tips-card h3 {
+            font-size: 1rem;
+            color: var(--primary-dark);
+        }
+
+        .tips-list {
+            padding-right: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #334155;
+        }
+
+        .blog-links {
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            border-radius: 14px;
+            padding: 12px 14px;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        .blog-links a {
+            color: var(--primary-dark);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .copy-status {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+            min-height: 20px;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 16px;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>✨ سکن ٹائپ فائنڈر</h1>
+            <span class="progress-text" id="progressText">سوال 1 / 6</span>
+        </header>
+
+        <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+
+        <div id="quizArea">
+            <div class="question-card">
+                <div class="question-title" id="questionTitle"></div>
+                <div class="options-list" id="optionsList"></div>
+            </div>
+
+            <div class="nav-row">
+                <button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()">← پچھلا</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>اگلا →</button>
+            </div>
+        </div>
+
+        <div class="result-box" id="resultArea">
+            <div class="result-banner">
+                <div class="result-label">آپ کی جلد کی ممکنہ قسم</div>
+                <div class="result-type" id="resultType"></div>
+                <div class="result-summary" id="resultSummary"></div>
+            </div>
+
+            <div class="tips-card">
+                <h3>دیکھ بھال کے مفید نکات</h3>
+                <ul class="tips-list" id="tipsList"></ul>
+            </div>
+
+            <div class="blog-links">
+                مزید رہنمائی کے لیے وزٹ کریں:
+                <a href="https://herbmedglowskin.blogspot.com/" target="_blank" rel="noopener">HerbMedGlow Skin</a>
+                اور
+                <a href="https://herbmedglow.blogspot.com/" target="_blank" rel="noopener">HerbMedGlow</a>
+            </div>
+
+            <div class="copy-status" id="copyStatus"></div>
+
+            <div class="nav-row">
+                <button class="btn btn-secondary" onclick="copyResult()">📋 نتیجہ کاپی کریں</button>
+                <button class="btn btn-primary" onclick="restartQuiz()">🔄 دوبارہ جانچیں</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <a href="index.html">← تمام ٹولز پر واپس جائیں</a>
+    </footer>
+
+    <script>
+        const questions = [
+            {
+                q: "1. منہ دھونے کے ایک گھنٹے بعد (بغیر کوئی کریم لگائے) آپ کی جلد کیسی محسوس ہوتی ہے؟",
+                options: [
+                    { text: "چہرے پر کھنچاؤ، خشکی یا ہلکا کھردرا پن محسوس ہوتا ہے", type: "dry" },
+                    { text: "پیشانی، ناک اور ٹھوڑی پر چکناہٹ یا چمک آ جاتی ہے", type: "oily" },
+                    { text: "صرف ناک اور پیشانی پر ہلکی چکناہٹ جبکہ گال نارمل یا خشک ہوتے ہیں", type: "combination" },
+                    { text: "نہ زیادہ خشک اور نہ زیادہ چکنی، بالکل متوازن اور آرام دہ لگتی ہے", type: "normal" }
+                ]
+            },
+            {
+                q: "2. دوپہر کے وقت آپ کے چہرے کی حالت کیسی ہوتی ہے؟",
+                options: [
+                    { text: "جلد خشک یا بے رونق دکھائی دیتی ہے", type: "dry" },
+                    { text: "پورے چہرے پر نمایاں چکناہٹ اور پسینہ سا آ جاتا ہے", type: "oily" },
+                    { text: "T-Zone (پیشانی و ناک) چمکتا ہے لیکن گال ٹھیک رہتے ہیں", type: "combination" },
+                    { text: "زیادہ تر وقت تروتازہ اور متوازن رہتی ہے", type: "normal" }
+                ]
+            },
+            {
+                q: "3. ناک اور گالوں کے قریب مسام (Pores) آپ کو کیسے نظر آتے ہیں؟",
+                options: [
+                    { text: "بہت باریک یا تقریباً نظر نہیں آتے", type: "dry" },
+                    { text: "واضح اور کھلے ہوئے محسوس ہوتے ہیں", type: "oily" },
+                    { text: "ناک کے آس پاس کھلے لیکن گالوں پر باریک ہوتے ہیں", type: "combination" },
+                    { text: "درمیانے اور متوازن نظر آتے ہیں", type: "normal" }
+                ]
+            },
+            {
+                q: "4. دانے، بلیک ہیڈز یا چکناہٹ کے مسائل کا سامنا کتنا ہوتا ہے؟",
+                options: [
+                    { text: "بہت کم، البتہ خشکی سے ہلکی جلن یا فلیکس ہو سکتے ہیں", type: "dry" },
+                    { text: "اکثر دانے، وائٹ/بلیک ہیڈز یا چکناہٹ کا مسئلہ رہتا ہے", type: "oily" },
+                    { text: "کبھی کبھار صرف پیشانی، ناک یا ٹھوڑی پر دانے بنتے ہیں", type: "combination" },
+                    { text: "شاذ و نادر ہی کوئی مسئلہ ہوتا ہے", type: "normal" }
+                ]
+            },
+            {
+                q: "5. سرد اور خشک موسم میں آپ کی جلد کیسا ردعمل دیتی ہے؟",
+                options: [
+                    { text: "جلد بہت زیادہ خشک، کھنچی ہوئی یا پھٹی ہوئی لگنے لگتی ہے", type: "dry" },
+                    { text: "موسم بدلنے کے باوجود چکناہٹ برقرار رہتی ہے", type: "oily" },
+                    { text: "گال خشک ہو جاتے ہیں لیکن درمیانی حصہ نارمل رہتا ہے", type: "combination" },
+                    { text: "معمول کے مطابق رہتی ہے، بس ہلکی موئسچرائزنگ کافی ہوتی ہے", type: "normal" }
+                ]
+            },
+            {
+                q: "6. نئی صابن، فیس واش یا سکن کیئر پروڈکٹ استعمال کرنے پر کیا ہوتا ہے؟",
+                options: [
+                    { text: "جلد جلدی خشک یا حساس ہو کر کھنچنے لگتی ہے", type: "dry" },
+                    { text: "کچھ مصنوعات جلد کو زیادہ چکنا یا بھاری کر دیتی ہیں", type: "oily" },
+                    { text: "ایک ہی چیز پورے چہرے کے لیے موزوں نہیں لگتی", type: "combination" },
+                    { text: "زیادہ تر معیاری مصنوعات آسانی سے سوٹ کر جاتی ہیں", type: "normal" }
+                ]
+            }
+        ];
+
+        const profiles = {
+            oily: {
+                title: "چکنی جلد (Oily Skin)",
+                summary: "آپ کی جلد میں سیبم (قدرتی تیل) کی پیداوار زیادہ ہے، جس سے چمک، کھلے مسام یا دانوں کا امکان بڑھ سکتا ہے۔",
+                tips: [
+                    "دن میں دو بار ہلکا، جیل یا فوم بیسڈ کلینزر استعمال کریں۔",
+                    "آئل فری یا لائٹ ویٹ موئسچرائزر اور سن اسکرین کو ترجیح دیں۔",
+                    "بھاری اور بہت زیادہ چکنی کریموں سے پرہیز کریں۔"
+                ]
+            },
+            dry: {
+                title: "خشک جلد (Dry Skin)",
+                summary: "آپ کی جلد میں نمی اور قدرتی تیل کی کمی ہے، جس سے کھنچاؤ، خشکی یا بے رونقی محسوس ہو سکتی ہے۔",
+                tips: [
+                    "سخت صابن کے بجائے نرم، ہائیڈریٹنگ کلینزر استعمال کریں۔",
+                    "منہ دھونے کے فوراً بعد گاڑھا موئسچرائزر لگائیں تاکہ نمی برقرار رہے۔",
+                    "بہت گرم پانی سے چہرہ دھونے سے گریز کریں۔"
+                ]
+            },
+            combination: {
+                title: "ملی جلی جلد (Combination Skin)",
+                summary: "آپ کے چہرے کے کچھ حصے (عموماً T-Zone) چکنے جبکہ باقی حصے خشک یا نارمل ہوتے ہیں۔",
+                tips: [
+                    "متوازن اور ہلکا کلینزر استعمال کریں جو جلد کو زیادہ خشک نہ کرے۔",
+                    "ضرورت کے مطابق مختلف حصوں پر الگ دیکھ بھال اپنائیں۔",
+                    "روزانہ صبح سن اسکرین کا استعمال جاری رکھیں۔"
+                ]
+            },
+            normal: {
+                title: "نارمل / متوازن جلد (Normal Skin)",
+                summary: "آپ کی جلد میں نمی اور تیل کا توازن نسبتاً بہتر ہے، نہ زیادہ خشک ہے اور نہ زیادہ چکنی۔",
+                tips: [
+                    "سادہ اور متوازن روٹین (کلینزر، موئسچرائزر، سن اسکرین) برقرار رکھیں۔",
+                    "دن بھر مناسب مقدار میں پانی پینے اور نیند کا خیال رکھیں۔",
+                    "کسی بھی نئی پروڈکٹ کو آہستہ آہستہ روٹین میں شامل کریں۔"
+                ]
+            }
+        };
+
+        let currentIndex = 0;
+        let answers = new Array(questions.length).fill(null);
+        let latestResultText = "";
+
+        function saveProgress() {
+            try {
+                localStorage.setItem('herbmed_skin_finder_v1', JSON.stringify({ currentIndex, answers }));
+            } catch (e) {}
+        }
+
+        function loadProgress() {
+            try {
+                const raw = localStorage.getItem('herbmed_skin_finder_v1');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed.answers) && parsed.answers.length === questions.length) {
+                        answers = parsed.answers;
+                        currentIndex = Math.min(Math.max(0, parsed.currentIndex || 0), questions.length - 1);
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function renderQuestion() {
+            document.getElementById('quizArea').style.display = 'block';
+            document.getElementById('resultArea').classList.remove('visible');
+
+            const item = questions[currentIndex];
+            document.getElementById('progressText').innerText = `سوال ${currentIndex + 1} / ${questions.length}`;
+            document.getElementById('progressFill').style.width = `${((currentIndex + 1) / questions.length) * 100}%`;
+            document.getElementById('questionTitle').innerText = item.q;
+
+            const optionsList = document.getElementById('optionsList');
+            optionsList.innerHTML = '';
+
+            item.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'option-btn' + (answers[currentIndex] === opt.type ? ' selected' : '');
+                btn.innerText = opt.text;
+                btn.onclick = () => selectOption(opt.type, idx);
+                optionsList.appendChild(btn);
+            });
+
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = !answers[currentIndex];
+            nextBtn.innerText = currentIndex === questions.length - 1 ? 'نتیجہ دیکھیں ✓' : 'اگلا →';
+        }
+
+        function selectOption(type) {
+            answers[currentIndex] = type;
+            saveProgress();
+            renderQuestion();
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                saveProgress();
+                renderQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (!answers[currentIndex]) return;
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                saveProgress();
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function calculateWinner() {
+            const scores = { oily: 0, dry: 0, combination: 0, normal: 0 };
+            answers.forEach(ans => {
+                if (ans && scores[ans] !== undefined) {
+                    scores[ans]++;
+                }
+            });
+
+            if (scores.oily > 0 && scores.dry > 0 && Math.abs(scores.oily - scores.dry) <= 1) {
+                return 'combination';
+            }
+
+            let bestType = 'normal';
+            let bestScore = -1;
+            Object.keys(scores).forEach(key => {
+                if (scores[key] > bestScore) {
+                    bestScore = scores[key];
+                    bestType = key;
+                }
+            });
+            return bestType;
+        }
+
+        function showResult() {
+            const typeKey = calculateWinner();
+            const profile = profiles[typeKey];
+
+            document.getElementById('quizArea').style.display = 'none';
+            document.getElementById('resultArea').classList.add('visible');
+            document.getElementById('progressText').innerText = 'مکمل';
+            document.getElementById('progressFill').style.width = '100%';
+
+            document.getElementById('resultType').innerText = profile.title;
+            document.getElementById('resultSummary').innerText = profile.summary;
+
+            const tipsList = document.getElementById('tipsList');
+            tipsList.innerHTML = profile.tips.map(t => `<li>${t}</li>`).join('');
+
+            latestResultText = `${profile.title}\n${profile.summary}\nنکات:\n- ${profile.tips.join('\n- ')}`;
+            document.getElementById('copyStatus').innerText = '';
+        }
+
+        function copyResult() {
+            if (!latestResultText) return;
+            const doneMsg = 'نتیجہ کاپی ہو گیا ہے';
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(latestResultText).then(() => {
+                        document.getElementById('copyStatus').innerText = doneMsg;
+                    }).catch(() => fallbackCopy(doneMsg));
+                } else {
+                    fallbackCopy(doneMsg);
+                }
+            } catch (e) {
+                fallbackCopy(doneMsg);
+            }
+        }
+
+        function fallbackCopy(msg) {
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = latestResultText;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                document.getElementById('copyStatus').innerText = msg;
+            } catch (e) {
+                document.getElementById('copyStatus').innerText = 'کاپی ممکن نہیں ہو سکا';
+            }
+        }
+
+        function restartQuiz() {
+            currentIndex = 0;
+            answers = new Array(questions.length).fill(null);
+            latestResultText = "";
+            saveProgress();
+            renderQuestion();
+        }
+
+        loadProgress();
+        renderQuestion();
+    </script>
+</body>
+</html>
