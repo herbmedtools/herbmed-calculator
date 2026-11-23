@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>کیو آر کوڈ جنریٹر | QR Code Generator</title>
+    <meta name="description" content="کسی بھی لنک یا متن کا فوری QR کوڈ بنائیں اور PNG تصویر کے طور پر ڈاؤن لوڈ کریں۔">
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-dark: #115e59;
+            --primary-light: #ccfbf1;
+            --bg: #f0fdfa;
+            --card: #ffffff;
+            --text: #134e4a;
+            --muted: #64748b;
+            --border: #cbd5e1;
+            --soft: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 460px;
+            background: var(--card);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(15, 118, 110, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        header {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
+        }
+
+        header h1 {
+            font-size: 1.15rem;
+            color: var(--primary);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        textarea, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            font-size: 0.96rem;
+            background: var(--soft);
+            color: var(--text);
+            outline: none;
+        }
+
+        textarea {
+            min-height: 85px;
+            resize: vertical;
+            line-height: 1.5;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .qr-preview-wrap {
+            background: var(--soft);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 18px 12px;
+            min-height: 210px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #qrContainer {
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            display: none;
+        }
+
+        #qrContainer.visible {
+            display: inline-block;
+        }
+
+        #qrContainer img, #qrContainer canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .placeholder-txt {
+            font-size: 0.88rem;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .btn-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 13px 10px;
+            border: none;
+            border-radius: 14px;
+            font-size: 0.96rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-download {
+            background: #16a34a;
+            color: #ffffff;
+        }
+
+        .btn-clear {
+            grid-column: span 2;
+            background: #f1f5f9;
+            color: var(--text);
+            padding: 11px;
+            font-size: 0.92rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .status-msg {
+            text-align: center;
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            min-height: 20px;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 16px;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🔳 کیو آر کوڈ جنریٹر</h1>
+        </header>
+
+        <div class="form-group">
+            <label for="qrInput">لنک (URL) یا متن درج کریں:</label>
+            <textarea id="qrInput" placeholder="https://herbmedtools.github.io/"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="qrSize">QR کوڈ کا سائز:</label>
+            <select id="qrSize">
+                <option value="180">چھوٹا (180×180)</option>
+                <option value="220" selected>درمیانہ (220×220)</option>
+                <option value="280">بڑا (280×280)</option>
+            </select>
+        </div>
+
+        <div class="qr-preview-wrap">
+            <div id="qrContainer"></div>
+            <div class="placeholder-txt" id="placeholderTxt">لنک یا متن لکھ کر "QR کوڈ بنائیں" دبائیں</div>
+        </div>
+
+        <div class="btn-row">
+            <button type="button" class="btn btn-primary" onclick="generateQR()">🔳 QR کوڈ بنائیں</button>
+            <button type="button" id="downloadBtn" class="btn btn-download" onclick="downloadQR()" disabled>⬇ ڈاؤن لوڈ</button>
+            <button type="button" class="btn btn-clear" onclick="clearQR()">↺ صاف کریں</button>
+        </div>
+
+        <div class="status-msg" id="statusMsg"></div>
+    </div>
+
+    <footer>
+        <a href="index.html">← تمام ٹولز پر واپس جائیں</a>
+    </footer>
+
+    <script>
+        function saveQRInput(text, size) {
+            try {
+                localStorage.setItem('herbmed_qr_gen_v1', JSON.stringify({ text, size }));
+            } catch (e) {}
+        }
+
+        function loadQRInput() {
+            try {
+                const raw = localStorage.getItem('herbmed_qr_gen_v1');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed.text) document.getElementById('qrInput').value = parsed.text;
+                    if (parsed.size) document.getElementById('qrSize').value = parsed.size;
+                }
+            } catch (e) {}
+        }
+
+        function generateQR() {
+            const text = document.getElementById('qrInput').value.trim();
+            const size = parseInt(document.getElementById('qrSize').value, 10) || 220;
+            const container = document.getElementById('qrContainer');
+            const placeholder = document.getElementById('placeholderTxt');
+            const status = document.getElementById('statusMsg');
+
+            status.innerText = '';
+
+            if (!text) {
+                status.innerText = 'براہ کرم کوئی لنک یا متن درج کریں۔';
+                return;
+            }
+
+            if (typeof QRCode === 'undefined') {
+                status.innerText = 'QR لائبریری لوڈ نہیں ہو سکی؛ انٹرنیٹ چیک کریں۔';
+                return;
+            }
+
+            try {
+                container.innerHTML = '';
+                new QRCode(container, {
+                    text: text,
+                    width: size,
+                    height: size,
+                    colorDark: '#0f766e',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+
+                container.classList.add('visible');
+                placeholder.style.display = 'none';
+                document.getElementById('downloadBtn').disabled = false;
+                saveQRInput(text, String(size));
+                status.innerText = 'QR کوڈ تیار ہو گیا ہے';
+            } catch (e) {
+                status.innerText = 'QR کوڈ بنانے میں مسئلہ پیش آیا';
+            }
+        }
+
+        function downloadQR() {
+            const container = document.getElementById('qrContainer');
+            const status = document.getElementById('statusMsg');
+            try {
+                const img = container.querySelector('img');
+                const canvas = container.querySelector('canvas');
+                let dataUrl = '';
+
+                if (img && img.src && img.src.startsWith('data:image')) {
+                    dataUrl = img.src;
+                } else if (canvas) {
+                    dataUrl = canvas.toDataURL('image/png');
+                }
+
+                if (!dataUrl) {
+                    status.innerText = 'پہلے QR کوڈ بنائیں۔';
+                    return;
+                }
+
+                const a = document.createElement('a');
+                a.href = dataUrl;
+                a.download = 'herbmed-qr-code.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                status.innerText = 'QR کوڈ ڈاؤن لوڈ ہو رہا ہے';
+            } catch (e) {
+                status.innerText = 'ڈاؤن لوڈ ممکن نہیں ہو سکا';
+            }
+        }
+
+        function clearQR() {
+            document.getElementById('qrInput').value = '';
+            const container = document.getElementById('qrContainer');
+            container.innerHTML = '';
+            container.classList.remove('visible');
+            document.getElementById('placeholderTxt').style.display = 'block';
+            document.getElementById('downloadBtn').disabled = true;
+            document.getElementById('statusMsg').innerText = '';
+            saveQRInput('', document.getElementById('qrSize').value);
+        }
+
+        loadQRInput();
+    </script>
+</body>
+</html>
