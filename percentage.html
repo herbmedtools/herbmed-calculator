@@ -1,8 +1,7 @@
-
 <!DOCTYPE html>
-<html lang="ur">
+<html lang="ur" dir="rtl">
 <head>
-  
+
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WPNJHY5J6T"></script>
 <script>
@@ -11,10 +10,13 @@
   gtag('js', new Date());
   gtag('config', 'G-WPNJHY5J6T');
 </script>
- 
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HerbMed Tools - Percentage Calculator</title>
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://herbmedtools.github.io/herbmed-calculator/percentage.html">
+<title>مفت آن لائن فیصد کیلکولیٹر — Percentage Calculator | HerbMed Tools</title>
+<meta name="description" content="کسی عدد کا فیصد، ایک عدد دوسرے کا کتنے فیصد ہے، فیصد اضافہ اور فیصد کمی آسانی سے معلوم کریں۔ موبائل فرینڈلی اور مفت آن لائن ٹول۔">
 
 <style>
 body {
@@ -23,6 +25,20 @@ body {
     text-align: center;
     background: #f0f5f2;
     padding: 15px;
+}
+
+.top-nav {
+    margin-bottom: 12px;
+}
+
+.top-nav a {
+    color: #18734b;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.top-nav a:hover {
+    text-decoration: underline;
 }
 
 .container {
@@ -34,11 +50,14 @@ body {
     box-shadow: 0 2px 10px #ccc;
 }
 
-h1 { color: #18734b; }
+h1 { color: #18734b; margin-bottom: 6px; }
+
+h2 { font-size: 1.2rem; color: #24352d; margin-top: 4px; }
 
 h3 {
     color: #333;
     margin-top: 25px;
+    font-size: 1.05rem;
 }
 
 input {
@@ -59,6 +78,7 @@ button {
     border-radius: 7px;
     font-size: 16px;
     margin: 7px;
+    cursor: pointer;
 }
 
 .clear {
@@ -71,11 +91,53 @@ button {
     font-weight: bold;
     margin: 12px;
 }
+
+.guide-box {
+    margin-top: 24px;
+    padding: 14px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    text-align: right;
+    font-size: 0.9rem;
+    color: #374151;
+    line-height: 1.65;
+}
+
+.guide-box h2 {
+    font-size: 1rem;
+    color: #18734b;
+    margin: 0 0 8px;
+}
+
+.guide-box ul {
+    margin: 6px 0 0;
+    padding-right: 18px;
+}
+
+.related-links {
+    margin-top: 12px;
+    font-size: 0.88rem;
+}
+
+.related-links a {
+    display: inline-block;
+    margin-left: 10px;
+    color: #18734b;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.related-links a:hover {
+    text-decoration: underline;
+}
 </style>
 </head>
 
 <body>
-    <a href="home.html">مرکزی صفحے پر واپس جائیں</a>
+    <div class="top-nav">
+        <a href="index.html">← مرکزی صفحے پر واپس جائیں</a>
+    </div>
 
 <div class="container">
 
@@ -113,6 +175,24 @@ button {
 <button onclick="calculate4()">حساب کریں</button>
 <button class="clear" onclick="clear4()">صاف کریں</button>
 <p class="result" id="result4"></p>
+
+<div class="guide-box">
+  <h2>فیصد کیلکولیٹر استعمال کرنے کا طریقہ</h2>
+  <p style="margin:0;">
+    یہ ٹول چار مختلف قسم کے فیصد حسابات براہِ راست آپ کے براؤزر میں فوراً حل کرتا ہے:
+  </p>
+  <ul>
+    <li><strong>عدد کا فیصد:</strong> عدد اور فیصد درج کر کے "حساب کریں" دبائیں۔</li>
+    <li><strong>تناسبی فیصد:</strong> پہلا اور دوسرا عدد لکھ کر جانیں کہ پہلا عدد دوسرے کا کتنے فیصد ہے۔</li>
+    <li><strong>فیصد اضافہ یا کمی:</strong> اصل عدد اور اضافے یا کمی کا فیصد لکھ کر نیا عدد معلوم کریں۔</li>
+  </ul>
+  <div class="related-links">
+    دیگر ٹولز:
+    <a href="calculator.html">عام کیلکولیٹر</a>
+    <a href="stopwatch.html">اسٹاپ واچ</a>
+    <a href="image-compressor.html">امیج کمپریسر</a>
+  </div>
+</div>
 
 </div>
 
