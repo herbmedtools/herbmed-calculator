@@ -1,0 +1,1 @@
+Sitemap: https://herbmedtools.github.io/herbmed-calculator/sitemap.xml
