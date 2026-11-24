@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-WVX45KVJ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Text, Watermark &amp; Collage Maker – Free Online Image Studio | HerbMed Tools</title>
-  <meta name="description" content="Add text with custom fonts and colors, apply text or logo watermarks, and create side-by-side or top-bottom photo collages online for free." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://herbmedtools.github.io/herbmed-calculator/image-studio.html" />
+  <title>Free Online Image Studio – Add Text, Watermark &amp; Collage Maker | HerbMed Tools</title>
+  <meta name="description" content="Add custom text with fonts and colors, apply text or logo watermarks, and make side-by-side or stacked photo collages online for free in your browser." />
   <style>
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
     body { margin: 0; background: #eef5f0; color: #111827; padding: 14px; }
@@ -43,6 +51,9 @@
     }
     .info-box h2 { margin: 0 0 6px; font-size: 1rem; color: #18764f; }
     .info-box ul { margin: 6px 0 0; padding-left: 18px; }
+    .related-links { margin-top: 10px; font-size: 0.84rem; }
+    .related-links a { color: #18764f; font-weight: 600; text-decoration: none; margin-right: 10px; }
+    .related-links a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -50,20 +61,18 @@
     <h1>Text, Watermark &amp; Collage Maker</h1>
 
     <div class="top-bar">
-      <label class="file-btn">
-        Main Image
-        <input type="file" id="mainInput" accept="image/*" hidden />
-      </label>
-      <label class="file-btn" style="background:#0284c7;">
-        2nd Collage Image
-        <input type="file" id="secondInput" accept="image/*" hidden />
-      </label>
+      <label for="mainInput" class="file-btn">Main Image</label>
+      <input type="file" id="mainInput" accept="image/*" hidden />
+
+      <label for="secondInput" class="file-btn" style="background:#0284c7;">2nd Collage Image</label>
+      <input type="file" id="secondInput" accept="image/*" hidden />
+
       <select id="exportFormat">
         <option value="png">Format: PNG</option>
         <option value="jpg">Format: JPG</option>
       </select>
-      <button id="resetBtn">Reset</button>
-      <button id="downloadBtn" class="primary">Download</button>
+      <button type="button" id="resetBtn">Reset</button>
+      <button type="button" id="downloadBtn" class="primary">Download</button>
     </div>
 
     <div class="canvas-wrap">
@@ -133,11 +142,9 @@
         <div class="row" style="margin-bottom:6px;">
           <span style="font-size:0.78rem;">WM Color:</span>
           <input type="color" id="wmColor" value="#ffffff" />
-          <label class="file-btn" style="background:#4b5563;">
-            WM Logo
-            <input type="file" id="wmImgInput" accept="image/*" hidden />
-          </label>
-          <button id="clearWmBtn">Clear</button>
+          <label for="wmImgInput" class="file-btn" style="background:#4b5563;">WM Logo</label>
+          <input type="file" id="wmImgInput" accept="image/*" hidden />
+          <button type="button" id="clearWmBtn">Clear</button>
         </div>
         <label><span>Watermark Opacity</span><span id="wmAlphaVal">45%</span></label>
         <input type="range" id="wmAlpha" min="10" max="100" value="45" />
@@ -170,6 +177,13 @@
         <li><strong>Watermark:</strong> Add brand text or a logo image, choose opacity, and place it in any corner or center.</li>
         <li><strong>Collage &amp; Export:</strong> Upload two photos for side-by-side or stacked layouts, add spacing or rounded corners, and download as PNG or JPG.</li>
       </ul>
+      <div class="related-links">
+        More tools:
+        <a href="image-compressor.html">Image Compressor</a>
+        <a href="image-resizer.html">Image Resizer</a>
+        <a href="image-cropper.html">Image Cropper</a>
+        <a href="index.html">All Tools</a>
+      </div>
     </div>
   </div>
 
