@@ -1,8 +1,7 @@
-
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
 <head>
-    
+
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WPNJHY5J6T"></script>
 <script>
@@ -14,14 +13,17 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HerbMed Image Cropper</title>
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://herbmedtools.github.io/herbmed-calculator/image-cropper.html">
+<title>مفت آن لائن امیج کراپر — تصویر کاٹیں اور تراشیں | HerbMed Tools</title>
+<meta name="description" content="موبائل یا براؤزر میں کسی بھی تصویر کو آسانی سے کاٹیں اور تراشیں۔ 1:1، 4:3، 16:9، 9:16 تناسب، 90 ڈگری روٹیشن اور PNG/JPG ڈاؤن لوڈ کی سہولت۔">
 <style>
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
   padding: 14px;
-  background: #f1f5f9;
+  background: #eef5f0;
   color: #222;
   font-family: Arial, sans-serif;
   text-align: center;
@@ -33,9 +35,12 @@ body {
   padding: 20px;
   background: white;
   border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.06);
 }
 
-h1 { color: #087f5b; }
+h1 { color: #18764f; font-size: 1.5rem; margin-bottom: 8px; }
+
+h2 { color: #18764f; font-size: 1.05rem; margin: 0 0 8px; }
 
 p { line-height: 1.8; }
 
@@ -48,7 +53,7 @@ button, select, input {
 }
 
 button {
-  background: #087f5b;
+  background: #18764f;
   color: white;
   border: 0;
   cursor: pointer;
@@ -104,10 +109,44 @@ button {
   font-size: 14px;
 }
 
-a {
+.guide-box {
+  margin-top: 20px;
+  padding: 14px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  text-align: right;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.guide-box ul {
+  margin: 6px 0 0;
+  padding-right: 18px;
+}
+
+.related-links {
+  margin-top: 12px;
+  font-size: 0.88rem;
+}
+
+.related-links a {
+  display: inline-block;
+  margin: 4px 0 4px 12px;
+  color: #18764f;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.related-links a:hover {
+  text-decoration: underline;
+}
+
+a.home-link {
   display: inline-block;
   margin-top: 18px;
-  color: #087f5b;
+  color: #18764f;
+  font-weight: bold;
 }
 </style>
 </head>
@@ -166,7 +205,25 @@ Crop دوبارہ منتخب کریں
 <p id="status" class="info"></p>
 </div>
 
-<a href="index.html">واپس ہوم پیج پر جائیں</a>
+<div class="guide-box">
+  <h2>امیج کراپر استعمال کرنے کا طریقہ</h2>
+  <p style="margin:0;">
+    یہ ٹول براہِ راست آپ کے براؤزر میں کام کرتا ہے اور آپ کی تصویر کسی بیرونی سرور پر اپلوڈ نہیں ہوتی۔
+  </p>
+  <ul>
+    <li><strong>حصہ منتخب کریں:</strong> تصویر اپلوڈ کر کے مطلوبہ حصے پر انگلی پھیر کر فریم بنائیں۔</li>
+    <li><strong>تناسب اور روٹیشن:</strong> ضرورت کے مطابق 1:1، 4:3، 16:9 یا 9:16 تناسب چنیں یا تصویر کو 90° گھمائیں۔</li>
+    <li><strong>ڈاؤن لوڈ:</strong> Crop Image دبانے کے بعد PNG یا JPG فارمیٹ میں تصویر محفوظ کریں۔</li>
+  </ul>
+  <div class="related-links">
+    دیگر ٹولز:
+    <a href="image-compressor.html">امیج کمپریسر</a>
+    <a href="image-resizer.html">امیج ری سائزر</a>
+    <a href="image-studio.html">امیج اسٹوڈیو</a>
+  </div>
+</div>
+
+<a class="home-link" href="index.html">واپس ہوم پیج پر جائیں</a>
 
 </div>
 
