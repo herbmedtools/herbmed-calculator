@@ -1,8 +1,7 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
+
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WPNJHY5J6T"></script>
 <script>
@@ -11,10 +10,13 @@
   gtag('js', new Date());
   gtag('config', 'G-WPNJHY5J6T');
 </script>
- 
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HerbMed Image Resizer</title>
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://herbmedtools.github.io/herbmed-calculator/image-resizer.html">
+<title>Free Online Image Resizer – Resize Pixels &amp; Social Media Sizes | HerbMed Tools</title>
+<meta name="description" content="Resize images online for free by width and height in pixels or presets for Pinterest (1000x1500), Instagram, Facebook, and Stories right in your browser.">
 
 <style>
 *{box-sizing:border-box}
@@ -37,7 +39,7 @@ box-shadow:0 5px 20px #0001;
 text-align:center;
 }
 
-h1{color:#19764e}
+h1{color:#19764e;font-size:1.5rem;margin-bottom:8px}
 
 p{color:#666}
 
@@ -88,7 +90,7 @@ border-radius:10px;
 margin-top:15px;
 }
 
-a{
+a.btn-link{
 display:block;
 text-decoration:none;
 background:#176bb5;
@@ -98,11 +100,50 @@ border-radius:9px;
 margin-top:12px;
 }
 
+a.btn-link[hidden]{
+display:none;
+}
+
 .home-btn{background:#18764f}
+
+.info-box{
+margin-top:20px;
+background:#f9fafb;
+border:1px solid #e5e7eb;
+border-radius:12px;
+padding:14px;
+text-align:left;
+font-size:0.88rem;
+color:#374151;
+line-height:1.55;
+}
+
+.info-box h2{
+margin:0 0 6px;
+font-size:1rem;
+color:#19764e;
+}
+
+.related-links{
+margin-top:10px;
+font-size:0.86rem;
+}
+
+.related-links a{
+color:#18764f;
+font-weight:bold;
+text-decoration:none;
+margin-right:10px;
+}
+
+.related-links a:hover{
+text-decoration:underline;
+}
 
 footer{
 color:#888;
 margin-top:25px;
+font-size:0.85rem;
 }
 </style>
 </head>
@@ -146,11 +187,24 @@ Maintain Aspect Ratio
 
 <div id="result" class="result" hidden></div>
 
-<a id="download" hidden>Download Resized Image</a>
+<a id="download" class="btn-link" hidden>Download Resized Image</a>
 
-<a class="home-btn" href="home.html">
+<a class="btn-link home-btn" href="index.html">
 مرکزی صفحے پر واپس جائیں
 </a>
+
+<div class="info-box">
+  <h2>How to Resize Images Online</h2>
+  <p style="margin:0;color:#374151;">
+    Upload your image, choose a preset such as Pinterest (1000 × 1500) or enter custom pixel dimensions, keep or unlock aspect ratio, and download locally in your browser.
+  </p>
+  <div class="related-links">
+    More tools:
+    <a href="image-compressor.html">Image Compressor</a>
+    <a href="image-cropper.html">Image Cropper</a>
+    <a href="image-studio.html">Image Studio</a>
+  </div>
+</div>
 
 <footer>HerbMed Tools | 2026</footer>
 
