@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>بیک گراؤنڈ ریموور</title>
+<style>
+body{font-family:Tahoma;margin:0;background:#FFF8EE;padding:12px}
+.box{background:#fff;border-radius:18px;padding:16px;max-width:600px;margin:auto}
+h1{color:#7c3aed;text-align:center}
+input[type=file]{display:block;width:100%;padding:14px;background:#faf5ff;border:2px dashed #7c3aed;border-radius:12px;margin:12px 0;font-size:16px}
+button{width:100%;padding:14px;border:0;border-radius:12px;background:#7c3aed;color:#fff;font-size:17px;font-weight:bold;margin-top:10px}
+button:disabled{opacity:.5}
+img{width:100%;border-radius:12px;margin-top:10px;background:#eee}
+select{width:100%;padding:12px;border-radius:12px;margin-top:10px}
+#msg{text-align:center;color:#7c3aed;font-weight:bold;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="box">
+<h1>بیک گراؤنڈ ریموور</h1>
+<p style="text-align:center">نیچے سے تصویر چنیں</p>
+<input type="file" id="file" accept="image/*">
+<p id="msg">تصویر چنیں</p>
+<img id="orig">
+<img id="res">
+<label>نیا پس منظر</label>
+<select id="bg">
+<option value="transparent">شفاف</option>
+<option value="white">سفید</option>
+<option value="black">کالا</option>
+<option value="green">سبز</option>
+</select>
+<button id="go" disabled>بیک گراؤنڈ ہٹائیں</button>
+<button id="dl" disabled>ڈاؤن لوڈ کریں</button>
+<p style="text-align:center;color:#888;font-size:13px;line-height:1.8">اس کو گٹ ہب پیجز کے لنک سے کھولیں، موبائل کی فائل سے سیدھا مت کھولیں</p>
+</div>
+<script type="module">
+import {removeBackground} from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm";
+let f=null, out=null, url="";
+const file=document.getElementById('file');
+file.addEventListener('change',()=>{
+  f=file.files[0];
+  if(!f) return;
+  document.getElementById('orig').src=URL.createObjectURL(f);
+  document.getElementById('go').disabled=false;
+  document.getElementById('msg').textContent="تصویر مل گئی، اب بیک گراؤنڈ ہٹائیں دبائیں";
+});
+document.getElementById('go').addEventListener('click',async()=>{
+  document.getElementById('msg').textContent="کام ہو رہا ہے، تھوڑا انتظار کریں... پہلی بار تھوڑا وقت لگے گا";
+  try{
+    const buf = await f.arrayBuffer();
+    out = await removeBackground(buf);
+    url = URL.createObjectURL(out);
+    document.getElementById('res').src=url;
+    document.getElementById('dl').disabled=false;
+    document.getElementById('msg').textContent="ہو گیا!";
+  }catch(e){
+    document.getElementById('msg').textContent="خرابی آ گئی، صفحہ ریفریش کر کے گٹ ہب والے لنک سے دوبارہ کوشش کریں";
+  }
+});
+document.getElementById('dl').addEventListener('click',()=>{
+  const a=document.createElement('a'); a.href=url; a.download="removed.png"; a.click();
+});
+</script>
+</body>
+</html>
