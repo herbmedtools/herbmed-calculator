@@ -1,363 +1,368 @@
 <!DOCTYPE html>
-<html lang="en" dir="auto">
+<html lang="ur" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Circle Crop Tool — تصویر گول کاٹیں</title>
-  <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #1e293b;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --accent-hover: #0284c7;
-      --border: #334155;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تصویر گول کاٹیں (Circle Crop Tool) - مفت آن لائن ٹول | Herbmed Tools</title>
+    <meta name="description" content="کسی بھی تصویر کو آن لائن گول دائرے میں کاٹیں (Circle Crop)، زوم اور سیٹ کریں، بارڈر لگائیں اور شفاف (Transparent PNG) بیک گراؤنڈ میں مفت ڈاؤن لوڈ کریں۔ واٹس ایپ، فیس بک اور لوگو کے لیے بہترین ٹول۔">
+    <meta name="keywords" content="circle crop image online, تصویر گول کاٹنا, round profile picture maker, crop image in circle png, herbmed tools">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://herbmedtools.github.io/circle-crop.html">
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:title" content="تصویر گول کاٹیں (Circle Crop Tool) - Herbmed Tools">
+    <meta property="og:description" content="اپنی تصویر یا لوگو کو گول دائرے میں کاٹیں اور PNG میں محفوظ کریں۔">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://herbmedtools.github.io/circle-crop.html">
 
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem 1rem;
-      gap: 1.5rem;
+    <!-- Structured Data (JSON-LD) for Google Search -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "تصویر گول کاٹیں (Circle Crop Tool)",
+      "url": "https://herbmedtools.github.io/circle-crop.html",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "PKR"
+      },
+      "description": "پروفائل تصویر یا لوگو کو گول دائرے میں کاٹنے اور شفاف PNG میں ڈاؤن لوڈ کرنے کا مفت آن لائن ٹول۔"
     }
+    </script>
 
-    header {
-      text-align: center;
-      max-width: 600px;
-    }
-
-    header h1 {
-      font-size: 1.5rem;
-      margin-bottom: 0.35rem;
-    }
-
-    header p {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .app-container {
-      background-color: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.5rem;
-      width: 100%;
-      max-width: 480px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.25rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
-    }
-
-    .file-upload {
-      width: 100%;
-    }
-
-    .file-upload label {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1rem;
-      border: 1px dashed var(--accent);
-      border-radius: 10px;
-      background-color: rgba(56, 189, 248, 0.08);
-      color: var(--accent);
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-
-    .file-upload label:hover {
-      background-color: rgba(56, 189, 248, 0.16);
-    }
-
-    #fileInput {
-      display: none;
-    }
-
-    .stage-wrapper {
-      position: relative;
-      width: 320px;
-      height: 320px;
-      border-radius: 10px;
-      overflow: hidden;
-      background-image:
-        linear-gradient(45deg, #273549 25%, transparent 25%),
-        linear-gradient(-45deg, #273549 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, #273549 75%),
-        linear-gradient(-45deg, transparent 75%, #273549 75%);
-      background-size: 20px 20px;
-      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
-      border: 1px solid var(--border);
-      touch-action: none;
-      cursor: grab;
-    }
-
-    .stage-wrapper:active {
-      cursor: grabbing;
-    }
-
-    canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-
-    .controls {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .zoom-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-      cursor: pointer;
-    }
-
-    .actions {
-      width: 100%;
-      display: flex;
-      gap: 0.75rem;
-    }
-
-    button {
-      flex: 1;
-      padding: 0.7rem 1rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s ease, opacity 0.2s ease;
-    }
-
-    button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    #resetBtn {
-      background-color: #334155;
-      color: var(--text);
-    }
-
-    #resetBtn:hover:not(:disabled) {
-      background-color: #475569;
-    }
-
-    #downloadBtn {
-      background-color: var(--accent);
-      color: #0f172a;
-    }
-
-    #downloadBtn:hover:not(:disabled) {
-      background-color: var(--accent-hover);
-      color: #ffffff;
-    }
-  </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Nastaliq Urdu', Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 520px;
+            border-radius: 16px;
+            padding: 25px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            text-align: center;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #0d6e5b;
+            font-size: 22px;
+            margin-top: 0;
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+        p.subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        .upload-btn-wrapper {
+            margin-bottom: 20px;
+        }
+        .btn-upload {
+            background-color: #0d6e5b;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            display: inline-block;
+            font-family: inherit;
+            border: none;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .canvas-wrapper {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px dashed #0d6e5b;
+            background-image: linear-gradient(45deg, #eee 25%, transparent 25%), 
+                              linear-gradient(-45deg, #eee 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, #eee 75%), 
+                              linear-gradient(-45deg, transparent 75%, #eee 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            touch-action: none;
+            cursor: grab;
+        }
+        .canvas-wrapper:active {
+            cursor: grabbing;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .controls {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-size: 14px;
+            color: #444;
+        }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #0d6e5b;
+        }
+        .btn-download {
+            display: none;
+            width: 100%;
+            background-color: #0d6e5b;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        .btn-download:hover {
+            background-color: #095244;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 8px;
+            margin-bottom: 20px;
+            color: #0d6e5b;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        /* SEO Guide Section */
+        .seo-guide {
+            text-align: right;
+            border-top: 1px solid #e5ecea;
+            padding-top: 20px;
+            margin-top: 10px;
+            line-height: 1.9;
+            font-size: 14px;
+            color: #444;
+        }
+        .seo-guide h2 {
+            color: #0d6e5b;
+            font-size: 18px;
+            margin-top: 18px;
+            margin-bottom: 8px;
+            line-height: 1.7;
+        }
+        .seo-guide ul, .seo-guide ol {
+            padding-right: 20px;
+            margin: 8px 0 15px 0;
+        }
+        .seo-guide li {
+            margin-bottom: 6px;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Circle Crop Tool — تصویر گول کاٹیں</h1>
-    <p>Upload an image, drag to position, zoom with the slider, and download a circle PNG.</p>
-  </header>
 
-  <main class="app-container">
-    <div class="file-upload">
-      <label for="fileInput">Choose Image / تصویر منتخب کریں</label>
-      <input type="file" id="fileInput" accept="image/*" />
+<div class="container">
+    <h1>تصویر گول کاٹیں (Circle Crop)</h1>
+    <p class="subtitle">پروفائل یا لوگو کے لیے کسی بھی تصویر کو گول دائرے میں کاٹیں اور شفاف (PNG) بیک گراؤنڈ میں محفوظ کریں۔</p>
+
+    <div class="upload-btn-wrapper">
+        <label for="imageInput" class="btn-upload">📁 تصویر منتخب کریں</label>
+        <input type="file" id="imageInput" accept="image/*">
     </div>
 
-    <div class="stage-wrapper" id="stage">
-      <canvas id="previewCanvas" width="320" height="320"></canvas>
+    <div class="canvas-wrapper" id="canvasBox">
+        <canvas id="cropCanvas" width="500" height="500"></canvas>
     </div>
 
-    <div class="controls">
-      <div class="zoom-row">
-        <span>Zoom / زوم</span>
-        <span id="zoomValue">100%</span>
-      </div>
-      <input type="range" id="zoomSlider" min="0.5" max="3" step="0.01" value="1" disabled />
+    <div class="controls" id="controls">
+        <div class="control-group">
+            <label for="zoomSlider">🔍 زوم (چھوٹا یا بڑا کریں):</label>
+            <input type="range" id="zoomSlider" min="0.2" max="3" step="0.02" value="1">
+        </div>
+        <div class="control-group">
+            <label for="borderSlider">⭕ بارڈر کی موٹائی (اختیاری):</label>
+            <input type="range" id="borderSlider" min="0" max="20" step="1" value="0">
+        </div>
+        <div class="control-group" style="flex-direction: row; align-items: center; justify-content: space-between;">
+            <label for="borderColor">🎨 بارڈر کا رنگ:</label>
+            <input type="color" id="borderColor" value="#0d6e5b">
+        </div>
     </div>
 
-    <div class="actions">
-      <button id="resetBtn" disabled>Reset / ری سیٹ</button>
-      <button id="downloadBtn" disabled>Download PNG / ڈاؤن لوڈ کریں</button>
-    </div>
-  </main>
+    <button class="btn-download" id="downloadBtn">⬇️ گول تصویر ڈاؤن لوڈ کریں (PNG)</button>
 
-  <script>
-    const SIZE = 320;
-    const RADIUS = SIZE / 2;
+    <a href="index.html" class="back-link">🏠 ہوم پیج پر واپس جائیں</a>
 
-    const fileInput = document.getElementById("fileInput");
-    const canvas = document.getElementById("previewCanvas");
-    const ctx = canvas.getContext("2d");
-    const zoomSlider = document.getElementById("zoomSlider");
-    const zoomValue = document.getElementById("zoomValue");
-    const resetBtn = document.getElementById("resetBtn");
-    const downloadBtn = document.getElementById("downloadBtn");
+    <!-- SEO Content: How to Use & Features -->
+    <section class="seo-guide" aria-label="استعمال کا طریقہ اور تفصیل">
+        <h2>سرکل کراپ ٹول استعمال کرنے کا طریقہ</h2>
+        <ol>
+            <li><strong>تصویر اپ لوڈ کریں:</strong> اوپر دیے گئے <em>«تصویر منتخب کریں»</em> بٹن پر کلک کر کے اپنے فون یا کمپیوٹر سے تصویر منتخب کریں۔</li>
+            <li><strong>پوزیشن اور زوم سیٹ کریں:</strong> انگلی یا ماؤس سے تصویر کو کھینچ کر درست جگہ لائیں اور زوم سلائیڈر سے سائز ایڈجسٹ کریں۔</li>
+            <li><strong>بارڈر لگائیں (اختیاری):</strong> اگر آپ گول تصویر کے گرد بارڈر چاہتے ہیں تو بارڈر کی موٹائی اور رنگ منتخب کریں۔</li>
+            <li><strong>ڈاؤن لوڈ کریں:</strong> <em>«گول تصویر ڈاؤن لوڈ کریں (PNG)»</em> پر کلک کر کے شفاف پس منظر والی تصویر محفوظ کر لیں۔</li>
+        </ol>
 
-    let img = null;
-    let baseScale = 1;
-    let zoom = 1;
+        <h2>اس ٹول کی اہم خصوصیات</h2>
+        <ul>
+            <li><strong>شفاف پس منظر (Transparent PNG):</strong> دائرے کے باہر کا حصہ خودکار طور پر شفاف رہتا ہے تاکہ تصویر ہر بیک گراؤنڈ پر صاف نظر آئے۔</li>
+            <li><strong>مکمل پرائیویسی:</strong> تصویر آپ کے براؤزر میں ہی پروسس ہوتی ہے، کسی بیرونی سرور پر اپ لوڈ نہیں کی جاتی۔</li>
+            <li><strong>موبائل اور ڈیسک ٹاپ فرینڈلی:</strong> موبائل ٹچ اور کمپیوٹر ماؤس دونوں پر آسانی سے کام کرتا ہے۔</li>
+            <li><strong>سوشل میڈیا اور لوگو کے لیے موزوں:</strong> واٹس ایپ، انسٹاگرام، فیس بک، یوٹیوب اور ویب سائٹ لوگو کے لیے بہترین۔</li>
+        </ul>
+
+        <h2>اکثر پوچھے جانے والے سوالات (FAQ)</h2>
+        <p><strong>کیا یہ ٹول بالکل مفت ہے؟</strong><br>
+        جی ہاں، Herbmed Tools پر تصویر گول کاٹنے کا یہ ٹول مکمل طور پر مفت ہے اور اس میں کوئی واٹر مارک نہیں آتا۔</p>
+        <p><strong>کون سے فارمیٹ سپورٹ ہوتے ہیں؟</strong><br>
+        آپ JPG، PNG اور WebP تصاویر اپ لوڈ کر سکتے ہیں اور آؤٹ پٹ شفاف PNG فارمیٹ میں حاصل کر سکتے ہیں۔</p>
+    </section>
+</div>
+
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const canvas = document.getElementById('cropCanvas');
+    const ctx = canvas.getContext('2d');
+    const zoomSlider = document.getElementById('zoomSlider');
+    const borderSlider = document.getElementById('borderSlider');
+    const borderColor = document.getElementById('borderColor');
+    const controls = document.getElementById('controls');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    let img = new Image();
+    let imgLoaded = false;
+    let scale = 1;
     let offsetX = 0;
     let offsetY = 0;
     let isDragging = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
+    let startX, startY;
 
-    function resetTransform() {
-      if (!img) return;
-      // Cover the circle diameter so there are no empty gaps at default zoom
-      baseScale = Math.max(SIZE / img.width, SIZE / img.height);
-      zoom = 1;
-      offsetX = 0;
-      offsetY = 0;
-      zoomSlider.value = "1";
-      zoomValue.textContent = "100%";
-      render();
-    }
-
-    function render() {
-      ctx.clearRect(0, 0, SIZE, SIZE);
-      if (!img) {
-        ctx.fillStyle = "#94a3b8";
-        ctx.font = "14px system-ui, sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("Select an image to start", SIZE / 2, SIZE / 2);
-        return;
-      }
-
-      const drawWidth = img.width * baseScale * zoom;
-      const drawHeight = img.height * baseScale * zoom;
-      const drawX = SIZE / 2 + offsetX - drawWidth / 2;
-      const drawY = SIZE / 2 + offsetY - drawHeight / 2;
-
-      // Draw full image first
-      ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
-
-      // Dim area outside the circle guide
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(0, 0, SIZE, SIZE);
-      ctx.arc(SIZE / 2, SIZE / 2, RADIUS, 0, Math.PI * 2, true);
-      ctx.fillStyle = "rgba(15, 23, 42, 0.65)";
-      ctx.fill();
-      ctx.restore();
-
-      // Draw crisp circular border guide
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(SIZE / 2, SIZE / 2, RADIUS - 1, 0, Math.PI * 2);
-      ctx.strokeStyle = "#38bdf8";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    fileInput.addEventListener("change", (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const loadedImg = new Image();
-        loadedImg.onload = () => {
-          img = loadedImg;
-          zoomSlider.disabled = false;
-          resetBtn.disabled = false;
-          downloadBtn.disabled = false;
-          resetTransform();
+    imageInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            img.onload = function() {
+                imgLoaded = true;
+                const minSide = Math.min(img.width, img.height);
+                scale = canvas.width / minSide;
+                zoomSlider.value = scale;
+                zoomSlider.min = scale * 0.3;
+                zoomSlider.max = scale * 4;
+                offsetX = 0;
+                offsetY = 0;
+                controls.style.display = 'flex';
+                downloadBtn.style.display = 'block';
+                draw();
+            };
+            img.src = event.target.result;
         };
-        loadedImg.src = event.target.result;
-      };
-      reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
     });
 
-    zoomSlider.addEventListener("input", () => {
-      zoom = parseFloat(zoomSlider.value);
-      zoomValue.textContent = `${Math.round(zoom * 100)}%`;
-      render();
+    function draw() {
+        if (!imgLoaded) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+
+        const drawWidth = img.width * scale;
+        const drawHeight = img.height * scale;
+        const x = (canvas.width - drawWidth) / 2 + offsetX;
+        const y = (canvas.height - drawHeight) / 2 + offsetY;
+
+        ctx.drawImage(img, x, y, drawWidth, drawHeight);
+        ctx.restore();
+
+        const borderW = parseInt(borderSlider.value);
+        if (borderW > 0) {
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, (canvas.width / 2) - (borderW / 2), 0, Math.PI * 2);
+            ctx.lineWidth = borderW;
+            ctx.strokeStyle = borderColor.value;
+            ctx.stroke();
+        }
+    }
+
+    zoomSlider.addEventListener('input', function() {
+        scale = parseFloat(this.value);
+        draw();
     });
 
-    resetBtn.addEventListener("click", resetTransform);
+    borderSlider.addEventListener('input', draw);
+    borderColor.addEventListener('input', draw);
 
-    canvas.addEventListener("pointerdown", (e) => {
-      if (!img) return;
-      isDragging = true;
-      dragStartX = e.clientX - offsetX;
-      dragStartY = e.clientY - offsetY;
-      canvas.setPointerCapture(e.pointerId);
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+            x: (clientX - rect.left) * (canvas.width / rect.width),
+            y: (clientY - rect.top) * (canvas.height / rect.height)
+        };
+    }
+
+    function startDrag(e) {
+        if (!imgLoaded) return;
+        isDragging = true;
+        const pos = getPos(e);
+        startX = pos.x - offsetX;
+        startY = pos.y - offsetY;
+    }
+
+    function moveDrag(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        offsetX = pos.x - startX;
+        offsetY = pos.y - startY;
+        draw();
+    }
+
+    function endDrag() {
+        isDragging = false;
+    }
+
+    canvas.addEventListener('mousedown', startDrag);
+    window.addEventListener('mousemove', moveDrag);
+    window.addEventListener('mouseup', endDrag);
+
+    canvas.addEventListener('touchstart', startDrag, { passive: false });
+    window.addEventListener('touchmove', moveDrag, { passive: false });
+    window.addEventListener('touchend', endDrag);
+
+    downloadBtn.addEventListener('click', function() {
+        if (!imgLoaded) return;
+        const link = document.createElement('a');
+        link.download = 'circle-cropped-image.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
     });
+</script>
 
-    canvas.addEventListener("pointermove", (e) => {
-      if (!isDragging) return;
-      offsetX = e.clientX - dragStartX;
-      offsetY = e.clientY - dragStartY;
-      render();
-    });
-
-    canvas.addEventListener("pointerup", () => {
-      isDragging = false;
-    });
-
-    downloadBtn.addEventListener("click", () => {
-      if (!img) return;
-
-      const outputSize = 600; // High-resolution output
-      const scaleRatio = outputSize / SIZE;
-      const outCanvas = document.createElement("canvas");
-      outCanvas.width = outputSize;
-      outCanvas.height = outputSize;
-      const outCtx = outCanvas.getContext("2d");
-
-      outCtx.save();
-      outCtx.beginPath();
-      outCtx.arc(outputSize / 2, outputSize / 2, outputSize / 2, 0, Math.PI * 2);
-      outCtx.closePath();
-      outCtx.clip();
-
-      const drawWidth = img.width * baseScale * zoom * scaleRatio;
-      const drawHeight = img.height * baseScale * zoom * scaleRatio;
-      const drawX = outputSize / 2 + offsetX * scaleRatio - drawWidth / 2;
-      const drawY = outputSize / 2 + offsetY * scaleRatio - drawHeight / 2;
-
-      outCtx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
-      outCtx.restore();
-
-      const link = document.createElement("a");
-      link.download = "circle-cropped.png";
-      link.href = outCanvas.toDataURL("image/png");
-      link.click();
-    });
-
-    render();
-  </script>
 </body>
 </html>
