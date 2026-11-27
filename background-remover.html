@@ -33,13 +33,11 @@ select{width:100%;padding:12px;border-radius:12px;margin-top:10px}
 <option value="green">سبز</option>
 <option value="#7c3aed">جامنی</option>
 </select>
-<label>کنارے کتنے صاف ہوں</label>
-<input type="range" id="smooth" min="0" max="10" value="3" style="width:100%">
 <button id="go" disabled>بیک گراؤنڈ ہٹائیں</button>
 <button id="dl" disabled>ڈاؤن لوڈ کریں</button>
 </div>
 <script>
-let myFile=null;
+let myFile=null, lastResult=null;
 const fileEl=document.getElementById('file');
 const msg=document.getElementById('msg');
 const orig=document.getElementById('orig');
@@ -55,18 +53,44 @@ fileEl.addEventListener('change',()=>{
 const seg=new SelfieSegmentation({locateFile:(f)=>"https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/"+f});
 seg.setOptions({modelSelection:1});
 seg.onResults((res)=>{
-  const w=res.image.width, h=res.image.height;
+  lastResult=res;
+  drawResult();
+});
+function drawResult(){
+  if(!lastResult) return;
+  const w=lastResult.image.width, h=lastResult.image.height;
   canvas.width=w; canvas.height=h;
-  ctx.clearRect(0,0,w,h);
+  const tmp=document.createElement('canvas'); tmp.width=w; tmp.height=h;
+  const tctx=tmp.getContext('2d');
+  tctx.drawImage(lastResult.image,0,0,w,h);
+  const imgData=tctx.getImageData(0,0,w,h);
+  const mtmp=document.createElement('canvas'); mtmp.width=w; mtmp.height=h;
+  const mctx=mtmp.getContext('2d');
+  mctx.drawImage(lastResult.segmentationMask,0,0,w,h);
+  const maskData=mctx.getImageData(0,0,w,h);
   const bg=document.getElementById('bg').value;
-  if(bg!=="transparent"){ ctx.fillStyle=bg; ctx.fillRect(0,0,w,h); }
-  ctx.drawImage(res.segmentationMask,0,0,w,h);
-  ctx.globalCompositeOperation='source-in';
-  ctx.drawImage(res.image,0,0,w,h);
-  ctx.globalCompositeOperation='source-over';
+  const out=ctx.createImageData(w,h);
+  for(let i=0;i<imgData.data.length;i+=4){
+    const m=maskData.data[i];
+    out.data[i]=imgData.data[i];
+    out.data[i+1]=imgData.data[i+1];
+    out.data[i+2]=imgData.data[i+2];
+    if(bg==="transparent"){
+      out.data[i+3]= m > 90 ? 255 : 0;
+    }else{
+      out.data[i+3]=255;
+      if(m <= 90){
+        if(bg==="white"){ out.data[i]=255; out.data[i+1]=255; out.data[i+2]=255; }
+        else if(bg==="black"){ out.data[i]=0; out.data[i+1]=0; out.data[i+2]=0; }
+        else if(bg==="green"){ out.data[i]=0; out.data[i+1]=200; out.data[i+2]=0; }
+        else if(bg==="#7c3aed"){ out.data[i]=124; out.data[i+1]=58; out.data[i+2]=237; }
+      }
+    }
+  }
+  ctx.putImageData(out,0,0);
   msg.textContent="ہو گیا! اب ڈاؤن لوڈ کریں";
   document.getElementById('dl').disabled=false;
-});
+}
 document.getElementById('go').addEventListener('click',async()=>{
   if(!myFile) return;
   msg.textContent="کام ہو رہا ہے، تھوڑا انتظار کریں...";
@@ -74,9 +98,7 @@ document.getElementById('go').addEventListener('click',async()=>{
   img.onload=async()=>{ await seg.send({image:img}); };
   img.src=URL.createObjectURL(myFile);
 });
-document.getElementById('bg').addEventListener('change',()=>{
-  if(document.getElementById('dl').disabled==false) document.getElementById('go').click();
-});
+document.getElementById('bg').addEventListener('change',()=>{ if(lastResult) drawResult(); });
 document.getElementById('dl').addEventListener('click',()=>{
   const a=document.createElement('a');
   a.href=canvas.toDataURL('image/png');
