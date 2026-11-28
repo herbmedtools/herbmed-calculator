@@ -80,5 +80,14 @@
     <loc>https://herbmedtools.github.io/herbmed-calculator/circle-crop.html</loc>
     <lastmod>2026-11-27</lastmod>
   </url>
+  <url>
+    <loc>https://herbmedtools.github.io/herbmed-calculator/ideal-weight-calculator.html</loc>
+    <lastmod>2026-11-27</lastmod>
+    <priority>0.80</priority>
+  </url>
+<url>
+  <loc>https://herbmedtools.github.io/herbmed-calculator/background-remover.html</loc>
+  <priority>0.8</priority>
+</url>
 
 </urlset>
