@@ -4,16 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Background Remover - HerbMed Tools</title>
-  <meta name="description" content="Remove image backgrounds quickly in your browser with smart edge cleanup and manual brush touch-ups. Free tool by HerbMed Tools." />
+  <meta name="description" content="Remove solid or similar color backgrounds fast in your browser and refine edges with Eraser and Restore brushes. Free tool by HerbMed Tools." />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background: #f4f7f6; color: #1f2937; line-height: 1.6; padding: 16px; }
     .container { max-width: 820px; margin: 0 auto; background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
     h1 { font-size: 1.5rem; color: #0f766e; margin-bottom: 6px; }
     .subtitle { font-size: 0.92rem; color: #4b5563; margin-bottom: 16px; }
-    .upload-box { border: 2px dashed #0d9488; border-radius: 12px; padding: 22px; text-align: center; background: #f0fdfa; margin-bottom: 16px; }
+    .upload-box { border: 2px dashed #0d9488; border-radius: 12px; padding: 20px; text-align: center; background: #f0fdfa; margin-bottom: 14px; }
     .upload-box input { display: none; }
-    .btn { display: inline-block; background: #0f766e; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .btn { display: inline-block; background: #0f766e; color: #fff; border: none; padding: 10px 15px; border-radius: 8px; font-size: 0.92rem; font-weight: 600; cursor: pointer; text-decoration: none; }
     .btn:hover { background: #115e59; }
     .btn:disabled { background: #9ca3af; cursor: not-allowed; }
     .btn-secondary { background: #e5e7eb; color: #111827; }
@@ -28,26 +28,35 @@
     .seo-guide h2 { font-size: 1.15rem; color: #111827; margin-bottom: 8px; }
     .seo-guide p, .seo-guide ul { margin-bottom: 10px; }
     .seo-guide ul { padding-left: 20px; }
+    .urdu-guide { margin-top: 18px; padding-top: 14px; border-top: 1px dashed #d1d5db; direction: rtl; text-align: right; font-size: 0.95rem; color: #1f2937; }
+    .urdu-guide h3 { font-size: 1.08rem; color: #0f766e; margin-bottom: 8px; }
+    .urdu-guide ul { padding-right: 20px; padding-left: 0; }
+    .urdu-guide li { margin-bottom: 6px; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Background Remover</h1>
-    <p class="subtitle">Clean up photo backgrounds and fine-tune edges directly on your device.</p>
+    <p class="subtitle">Remove solid or similar backgrounds instantly and clean edges with Eraser or Restore brushes.</p>
 
     <div class="upload-box">
       <input type="file" id="fileInput" accept="image/*" />
       <label for="fileInput" class="btn">Select Image</label>
-      <p style="margin-top: 8px; font-size: 0.82rem; color: #6b7280;">PNG, JPG, or WEBP • Large photos are auto-scaled for smooth mobile speed</p>
+      <p style="margin-top: 8px; font-size: 0.82rem; color: #6b7280;">PNG, JPG, or WEBP • Instant processing with zero heavy model download</p>
     </div>
 
     <div id="statusBox" class="status"></div>
 
     <div id="controlsBar" class="controls">
-      <button type="button" id="eraseBtn" class="btn">Eraser</button>
-      <button type="button" id="restoreBtn" class="btn btn-secondary">Restore Original</button>
+      <button type="button" id="magicBtn" class="btn">Click BG to Remove</button>
+      <button type="button" id="eraseBtn" class="btn btn-secondary">Eraser</button>
+      <button type="button" id="restoreBtn" class="btn btn-secondary">Restore</button>
       <label>
-        Brush Size:
+        Tolerance:
+        <input type="range" id="toleranceRange" min="5" max="120" value="35" />
+      </label>
+      <label>
+        Brush:
         <input type="range" id="brushSize" min="5" max="60" value="22" />
       </label>
     </div>
@@ -58,38 +67,47 @@
 
     <div id="actionsBar" class="actions">
       <button type="button" id="downloadBtn" class="btn" disabled>Download Transparent PNG</button>
-      <button type="button" id="resetBtn" class="btn btn-secondary">Clear</button>
+      <button type="button" id="resetBtn" class="btn btn-secondary">Reset Image</button>
     </div>
 
     <section class="seo-guide">
-      <h2>How to Remove Image Backgrounds cleanly</h2>
-      <p>Use the HerbMed Tools Background Remover to separate subjects from cluttered or solid backgrounds for product listings, profile avatars, and blog graphics.</p>
+      <h2>How to Remove Image Backgrounds Fast</h2>
+      <p>Use HerbMed Tools Background Remover to remove clean or uniform backgrounds immediately without waiting for heavy downloads.</p>
       <ul>
-        <li><strong>Upload your photo:</strong> Choose a clear image with good contrast between the subject and background.</li>
-        <li><strong>Automatic edge detection:</strong> The tool processes the image and previews transparency on a checkerboard grid.</li>
-        <li><strong>Touch up fine spots:</strong> Switch between <em>Eraser</em> to remove leftover background patches and <em>Restore Original</em> to bring back any clipped detail.</li>
-        <li><strong>Export PNG:</strong> Download the final image with a transparent background ready for design or publishing.</li>
+        <li><strong>Upload image:</strong> Pick a PNG, JPG, or WEBP photo.</li>
+        <li><strong>Remove background color:</strong> Keep <em>Click BG to Remove</em> selected and tap the background area, adjusting <em>Tolerance</em> if needed.</li>
+        <li><strong>Refine edges:</strong> Switch to <em>Eraser</em> to remove stray spots or <em>Restore</em> to bring back any part of the original image.</li>
+        <li><strong>Save result:</strong> Click <em>Download Transparent PNG</em> to save your image.</li>
       </ul>
+
+      <div class="urdu-guide">
+        <h3>مختصر اردو رہنمائی</h3>
+        <ul>
+          <li><strong>باقی پس منظر ہٹائیں:</strong> <em>Click BG to Remove</em> منتخب رکھ کر پس منظر کے باقی حصوں پر ٹیپ کریں، یا <em>Reset Image</em> دبا کر <em>Tolerance</em> تھوڑا بڑھا کر دوبارہ پس منظر پر ٹیپ کریں۔</li>
+          <li><strong>کنارے صاف کریں:</strong> <em>Eraser</em> برش سے بچے ہوئے ٹکڑے مٹائیں، اور اگر کوئی ضروری حصہ مٹ جائے تو <em>Restore</em> سے واپس لائیں۔</li>
+          <li><strong>تصویر محفوظ کریں:</strong> کام مکمل ہونے پر <em>Download Transparent PNG</em> دبا کر فائل ڈاؤن لوڈ کر لیں۔</li>
+        </ul>
+      </div>
     </section>
   </div>
 
-  <script type="module">
-    import { removeBackground } from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm";
-
+  <script>
     const fileInput = document.getElementById("fileInput");
     const statusBox = document.getElementById("statusBox");
     const controlsBar = document.getElementById("controlsBar");
     const canvasWrap = document.getElementById("canvasWrap");
     const actionsBar = document.getElementById("actionsBar");
     const canvas = document.getElementById("resultCanvas");
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     const downloadBtn = document.getElementById("downloadBtn");
     const resetBtn = document.getElementById("resetBtn");
+    const magicBtn = document.getElementById("magicBtn");
     const eraseBtn = document.getElementById("eraseBtn");
     const restoreBtn = document.getElementById("restoreBtn");
+    const toleranceRange = document.getElementById("toleranceRange");
     const brushSizeInput = document.getElementById("brushSize");
 
-    let mode = "erase"; // "erase" or "restore"
+    let mode = "magic"; // "magic", "erase", "restore"
     let drawing = false;
     let originalCanvas = document.createElement("canvas");
     let originalCtx = originalCanvas.getContext("2d");
@@ -101,19 +119,16 @@
 
     function setMode(newMode) {
       mode = newMode;
-      if (mode === "erase") {
-        eraseBtn.className = "btn";
-        restoreBtn.className = "btn btn-secondary";
-      } else {
-        restoreBtn.className = "btn";
-        eraseBtn.className = "btn btn-secondary";
-      }
+      magicBtn.className = mode === "magic" ? "btn" : "btn btn-secondary";
+      eraseBtn.className = mode === "erase" ? "btn" : "btn btn-secondary";
+      restoreBtn.className = mode === "restore" ? "btn" : "btn btn-secondary";
     }
 
+    magicBtn.addEventListener("click", () => setMode("magic"));
     eraseBtn.addEventListener("click", () => setMode("erase"));
     restoreBtn.addEventListener("click", () => setMode("restore"));
 
-    function downscaleIfNeeded(img, maxDim = 1400) {
+    function prepareCanvas(img, maxDim = 1400) {
       let { width, height } = img;
       if (width > maxDim || height > maxDim) {
         if (width >= height) {
@@ -124,69 +139,105 @@
           height = maxDim;
         }
       }
-      const temp = document.createElement("canvas");
-      temp.width = width;
-      temp.height = height;
-      temp.getContext("2d").drawImage(img, 0, 0, width, height);
-      return temp;
+      canvas.width = width;
+      canvas.height = height;
+      ctx.clearRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+
+      originalCanvas.width = width;
+      originalCanvas.height = height;
+      originalCtx.clearRect(0, 0, width, height);
+      originalCtx.drawImage(img, 0, 0, width, height);
     }
 
-    fileInput.addEventListener("change", async (e) => {
+    fileInput.addEventListener("change", (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
 
-      downloadBtn.disabled = true;
-      controlsBar.style.display = "none";
-      canvasWrap.style.display = "none";
-      actionsBar.style.display = "none";
-      setStatus("Loading image and preparing background removal...");
-
-      try {
-        const imgUrl = URL.createObjectURL(file);
-        const img = new Image();
-        img.onload = async () => {
-          URL.revokeObjectURL(imgUrl);
-          const scaledCanvas = downscaleIfNeeded(img, 1400);
-
-          originalCanvas.width = scaledCanvas.width;
-          originalCanvas.height = scaledCanvas.height;
-          originalCtx.clearRect(0, 0, originalCanvas.width, originalCanvas.height);
-          originalCtx.drawImage(scaledCanvas, 0, 0);
-
-          setStatus("Removing background... first run may take a moment to load the model.");
-          const blob = await removeBackground(scaledCanvas.toDataURL("image/png"));
-          const resultUrl = URL.createObjectURL(blob);
-          const resultImg = new Image();
-
-          resultImg.onload = () => {
-            URL.revokeObjectURL(resultUrl);
-            canvas.width = scaledCanvas.width;
-            canvas.height = scaledCanvas.height;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(resultImg, 0, 0, canvas.width, canvas.height);
-
-            controlsBar.style.display = "flex";
-            canvasWrap.style.display = "block";
-            actionsBar.style.display = "flex";
-            downloadBtn.disabled = false;
-            setStatus("Background removed. Use Eraser or Restore Original to refine edges.");
-          };
-          resultImg.src = resultUrl;
-        };
-        img.src = imgUrl;
-      } catch (err) {
-        setStatus("Could not process image automatically. Please try another image or refresh.");
-      }
+      const imgUrl = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(imgUrl);
+        prepareCanvas(img, 1400);
+        controlsBar.style.display = "flex";
+        canvasWrap.style.display = "block";
+        actionsBar.style.display = "flex";
+        downloadBtn.disabled = false;
+        setMode("magic");
+        setStatus("Image ready. Tap the background area to remove matching color, or use Eraser/Restore.");
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(imgUrl);
+        setStatus("Could not load this image format. Try another JPG or PNG.");
+      };
+      img.src = imgUrl;
     });
 
     function getCanvasCoords(clientX, clientY) {
       const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
       return {
-        x: (clientX - rect.left) * scaleX,
-        y: (clientY - rect.top) * scaleY
+        x: Math.floor(((clientX - rect.left) / rect.width) * canvas.width),
+        y: Math.floor(((clientY - rect.top) / rect.height) * canvas.height)
       };
+    }
+
+    function floodRemove(startX, startY, tolerance) {
+      if (startX < 0 || startY < 0 || startX >= canvas.width || startY >= canvas.height) return;
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imgData.data;
+      const w = canvas.width;
+      const h = canvas.height;
+      const startIdx = (startY * w + startX) * 4;
+
+      if (data[startIdx + 3] === 0) return;
+
+      const targetR = data[startIdx];
+      const targetG = data[startIdx + 1];
+      const targetB = data[startIdx + 2];
+      const visited = new Uint8Array(w * h);
+      const queue = [startX, startY];
+      let head = 0;
+
+      visited[startY * w + startX] = 1;
+
+      function matches(idx) {
+        if (data[idx + 3] === 0) return false;
+        const dr = Math.abs(data[idx] - targetR);
+        const dg = Math.abs(data[idx + 1] - targetG);
+        const db = Math.abs(data[idx + 2] - targetB);
+        return (dr + dg + db) / 3 <= tolerance;
+      }
+
+      while (head < queue.length) {
+        const x = queue[head++];
+        const y = queue[head++];
+        const idx = (y * w + x) * 4;
+
+        if (matches(idx)) {
+          data[idx + 3] = 0;
+
+          const neighbors = [
+            [x + 1, y],
+            [x - 1, y],
+            [x, y + 1],
+            [x, y - 1]
+          ];
+
+          for (let i = 0; i < neighbors.length; i++) {
+            const nx = neighbors[i][0];
+            const ny = neighbors[i][1];
+            if (nx >= 0 && ny >= 0 && nx < w && ny < h) {
+              const pPos = ny * w + nx;
+              if (!visited[pPos]) {
+                visited[pPos] = 1;
+                queue.push(nx, ny);
+              }
+            }
+          }
+        }
+      }
+
+      ctx.putImageData(imgData, 0, 0);
     }
 
     function applyBrush(x, y) {
@@ -199,7 +250,7 @@
         ctx.globalCompositeOperation = "destination-out";
         ctx.fillStyle = "rgba(0,0,0,1)";
         ctx.fill();
-      } else {
+      } else if (mode === "restore") {
         ctx.clip();
         ctx.drawImage(originalCanvas, 0, 0);
       }
@@ -208,14 +259,19 @@
 
     canvas.addEventListener("pointerdown", (e) => {
       if (!canvas.width) return;
+      const pos = getCanvasCoords(e.clientX, e.clientY);
+      if (mode === "magic") {
+        floodRemove(pos.x, pos.y, Number(toleranceRange.value));
+        setStatus("Background region removed. Adjust Tolerance or use Eraser/Restore if needed.");
+        return;
+      }
       drawing = true;
       canvas.setPointerCapture(e.pointerId);
-      const pos = getCanvasCoords(e.clientX, e.clientY);
       applyBrush(pos.x, pos.y);
     });
 
     canvas.addEventListener("pointermove", (e) => {
-      if (!drawing) return;
+      if (!drawing || mode === "magic") return;
       const pos = getCanvasCoords(e.clientX, e.clientY);
       applyBrush(pos.x, pos.y);
     });
@@ -235,13 +291,10 @@
     });
 
     resetBtn.addEventListener("click", () => {
-      fileInput.value = "";
+      if (!originalCanvas.width) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      controlsBar.style.display = "none";
-      canvasWrap.style.display = "none";
-      actionsBar.style.display = "none";
-      downloadBtn.disabled = true;
-      statusBox.style.display = "none";
+      ctx.drawImage(originalCanvas, 0, 0);
+      setStatus("Image reset to original.");
     });
   </script>
 </body>
